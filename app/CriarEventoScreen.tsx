@@ -86,7 +86,7 @@ export default function CriarEventoScreen({ navigation }: any) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
+          {}
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.backBtn}
@@ -98,7 +98,7 @@ export default function CriarEventoScreen({ navigation }: any) {
           </View>
 
           <FormCard title="">
-            {/* Esportes */}
+            {}
             <ChipSelector
               label="Esportes"
               options={ESPORTES}
@@ -106,7 +106,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               onToggle={toggleEsporte}
             />
 
-            {/* Nível */}
+            {}
             <ChipSelector
               label="Nível"
               options={NIVEIS}
@@ -114,7 +114,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               onToggle={toggleNivel}
             />
 
-            {/* Nome do Evento */}
+            {}
             <FormField
               label="Nome do Evento"
               placeholder="Ex: Futebolistas da Prainha"
@@ -123,7 +123,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               error={errors.nomeEvento}
             />
 
-            {/* Grupo Organizador */}
+            {}
             <FormField
               label="Grupo Organizador"
               placeholder="Ex: Varejão"
@@ -131,7 +131,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               onChangeText={set('grupoOrganizador')}
             />
 
-            {/* Descrição */}
+            {}
             <FormField
               label="Descrição"
               placeholder="Ex: Corrida de 5km"
@@ -142,7 +142,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               style={{ height: 80, textAlignVertical: 'top' }}
             />
 
-            {/* Data + Horário */}
+            {}
             <RowFields>
               <View style={{ flex: 1 }}>
                 <FormField
@@ -165,7 +165,7 @@ export default function CriarEventoScreen({ navigation }: any) {
               </View>
             </RowFields>
 
-            {/* Local + Vagas */}
+            {}
             <RowFields>
               <View style={{ flex: 1 }}>
                 <FormField
@@ -194,7 +194,7 @@ export default function CriarEventoScreen({ navigation }: any) {
             />
           </FormCard>
 
-          {/* Indicador de tela ativa (bottom tab hint) */}
+          {}
           <View style={styles.tabHint}>
             <View style={styles.tabDot} />
             <View style={styles.tabDot} />

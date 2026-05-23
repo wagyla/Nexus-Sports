@@ -96,7 +96,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
+          {}
           <View style={styles.header}>
             <TouchableOpacity
               style={styles.backBtn}
@@ -108,7 +108,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
           </View>
 
           <FormCard title="">
-            {/* Esportes */}
+            {}
             <ChipSelector
               label="Esportes"
               options={ESPORTES}
@@ -116,7 +116,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               onToggle={toggleEsporte}
             />
 
-            {/* Nível */}
+            {}
             <ChipSelector
               label="Nível"
               options={NIVEIS}
@@ -124,7 +124,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               onToggle={toggleNivel}
             />
 
-            {/* Nome do Grupo */}
+            {}
             <FormField
               label="Nome do Grupo"
               placeholder="Ex: Futebolistas da Prainha"
@@ -133,7 +133,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               error={errors.nomeGrupo}
             />
 
-            {/* Descrição */}
+            {}
             <FormField
               label="Descrição"
               placeholder="Ex: Corrida de Sem"
@@ -144,7 +144,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               style={{ height: 80, textAlignVertical: 'top' }}
             />
 
-            {/* Data + Horário */}
+            {}
             <RowFields>
               <View style={{ flex: 1 }}>
                 <FormField
@@ -167,7 +167,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               </View>
             </RowFields>
 
-            {/* Local + Vagas */}
+            {}
             <RowFields>
               <View style={{ flex: 1 }}>
                 <FormField
@@ -189,7 +189,7 @@ export default function CriarGrupoScreen({ navigation }: any) {
               </View>
             </RowFields>
 
-            {/* Adicionar membros */}
+            {}
             <Text style={styles.sectionLabel}>ADICIONAR MEMBROS</Text>
             <View style={styles.addMemberRow}>
               <FormField

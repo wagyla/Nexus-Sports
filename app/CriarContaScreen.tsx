@@ -55,7 +55,6 @@ export default function CriarContaScreen({ navigation }: any) {
 
   const handleCriarConta = () => {
     if (!validate()) return;
-    // TODO: integrar com backend
     console.log({ ...form, esportesFavoritos });
   };
 
@@ -141,7 +140,7 @@ export default function CriarContaScreen({ navigation }: any) {
             />
           </FormCard>
 
-          {/* Footer */}
+          
           <View style={styles.footer}>
             <Text style={styles.footerText}>Já tem uma conta? </Text>
             <TouchableOpacity onPress={() => navigation?.navigate('Login')}>
