@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import {
   FormField,
-  FormCard,
   ChipSelector,
   PrimaryButton,
   RowFields,
@@ -22,8 +21,8 @@ const ESPORTES: ChipOption[] = [
   { label: 'Corrida', value: 'corrida' },
   { label: 'Tênis', value: 'tenis' },
   { label: 'Vôlei', value: 'volei' },
+  { label: 'Ciclismo', value: 'ciclismo' },
   { label: 'Futebol', value: 'futebol' },
-  { label: 'Natação', value: 'natacao' },
   { label: '+Outro', value: 'outro' },
 ];
 
@@ -35,21 +34,15 @@ const NIVEIS: ChipOption[] = [
 ];
 
 export default function CriarEventoScreen({ navigation }: any) {
-  const [form, setForm] = useState({
-    nomeEvento: '',
-    grupoOrganizador: '',
-    descricao: '',
-    data: '',
-    horario: '',
-    local: '',
-    vagas: '',
-  });
+  const [nomeEvento, setNomeEvento] = useState('');
+  const [grupoOrganizador, setGrupoOrganizador] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [data, setData] = useState('');
+  const [horario, setHorario] = useState('');
+  const [local, setLocal] = useState('');
+  const [vagas, setVagas] = useState('');
   const [esportes, setEsportes] = useState<string[]>([]);
   const [nivel, setNivel] = useState<string[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const set = (field: string) => (value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
 
   const toggleEsporte = (value: string) =>
     setEsportes((prev) =>
@@ -61,18 +54,8 @@ export default function CriarEventoScreen({ navigation }: any) {
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.nomeEvento.trim()) e.nomeEvento = 'Informe o nome do evento.';
-    if (!form.data.trim()) e.data = 'Informe a data.';
-    if (!form.local.trim()) e.local = 'Informe o local.';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const handleCriarEvento = () => {
-    if (!validate()) return;
-    console.log({ ...form, esportes, nivel });
+    console.log({ nomeEvento, grupoOrganizador, descricao, data, horario, local, vagas, esportes, nivel });
   };
 
   return (
@@ -86,185 +69,122 @@ export default function CriarEventoScreen({ navigation }: any) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {}
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={() => navigation?.goBack()}
-            >
-              <Text style={styles.backIcon}>←</Text>
+            <TouchableOpacity onPress={() => navigation?.goBack()}>
+              <Text style={styles.backIcon}>‹</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Criar Evento</Text>
           </View>
 
-          <FormCard title="">
-            {}
-            <ChipSelector
-              label="Esportes"
-              options={ESPORTES}
-              selected={esportes}
-              onToggle={toggleEsporte}
-            />
+          <ChipSelector
+            label="Esportes"
+            options={ESPORTES}
+            selected={esportes}
+            onToggle={toggleEsporte}
+          />
 
-            {}
-            <ChipSelector
-              label="Nível"
-              options={NIVEIS}
-              selected={nivel}
-              onToggle={toggleNivel}
-            />
+          <FormField
+            label="Nome do Evento"
+            placeholder="Ex: Futevôlei na Prainha"
+            value={nomeEvento}
+            onChangeText={setNomeEvento}
+          />
 
-            {}
-            <FormField
-              label="Nome do Evento"
-              placeholder="Ex: Futebolistas da Prainha"
-              value={form.nomeEvento}
-              onChangeText={set('nomeEvento')}
-              error={errors.nomeEvento}
-            />
+          <FormField
+            label="Grupo Organizador"
+            placeholder="Ex: Vôlei jequi"
+            value={grupoOrganizador}
+            onChangeText={setGrupoOrganizador}
+          />
 
-            {}
-            <FormField
-              label="Grupo Organizador"
-              placeholder="Ex: Varejão"
-              value={form.grupoOrganizador}
-              onChangeText={set('grupoOrganizador')}
-            />
+          <FormField
+            label="Descrição:"
+            placeholder="Ex: Corrida de 5km"
+            value={descricao}
+            onChangeText={setDescricao}
+            multiline
+            numberOfLines={3}
+            style={{ height: 80, textAlignVertical: 'top', paddingTop: 12 }}
+          />
 
-            {}
-            <FormField
-              label="Descrição"
-              placeholder="Ex: Corrida de 5km"
-              value={form.descricao}
-              onChangeText={set('descricao')}
-              multiline
-              numberOfLines={3}
-              style={{ height: 80, textAlignVertical: 'top' }}
-            />
+          <RowFields>
+            <View style={{ flex: 1 }}>
+              <FormField
+                label="Data:"
+                placeholder="xx/xx/xxxx"
+                value={data}
+                onChangeText={setData}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <FormField
+                label="Horário:"
+                placeholder="xx:xx"
+                value={horario}
+                onChangeText={setHorario}
+                keyboardType="numeric"
+              />
+            </View>
+          </RowFields>
 
-            {}
-            <RowFields>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Data"
-                  placeholder="dd/mm/aaaa"
-                  value={form.data}
-                  onChangeText={set('data')}
-                  error={errors.data}
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Horário"
-                  placeholder="00:00"
-                  value={form.horario}
-                  onChangeText={set('horario')}
-                  keyboardType="numeric"
-                />
-              </View>
-            </RowFields>
+          <RowFields>
+            <View style={{ flex: 1 }}>
+              <FormField
+                label="Local:"
+                placeholder="Ex: Praia"
+                value={local}
+                onChangeText={setLocal}
+              />
+            </View>
+            <View style={{ flex: 0.5 }}>
+              <FormField
+                label="Vagas:"
+                placeholder="20"
+                value={vagas}
+                onChangeText={setVagas}
+                keyboardType="numeric"
+              />
+            </View>
+          </RowFields>
 
-            {}
-            <RowFields>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Local"
-                  placeholder="Ex: Praia"
-                  value={form.local}
-                  onChangeText={set('local')}
-                  error={errors.local}
-                />
-              </View>
-              <View style={{ flex: 0.5 }}>
-                <FormField
-                  label="Vagas"
-                  placeholder="25"
-                  value={form.vagas}
-                  onChangeText={set('vagas')}
-                  keyboardType="numeric"
-                />
-              </View>
-            </RowFields>
-
-            <PrimaryButton
-              title="Criar Evento"
-              onPress={handleCriarEvento}
-              style={{ marginTop: 12 }}
-            />
-          </FormCard>
-
-          {}
-          <View style={styles.tabHint}>
-            <View style={styles.tabDot} />
-            <View style={styles.tabDot} />
-            <View style={[styles.tabDot, styles.tabDotActive]} />
-          </View>
+          <PrimaryButton
+            title="Criar Evento"
+            onPress={handleCriarEvento}
+            style={{ marginTop: 8 }}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-import { themas } from '../global/themes';
-
-const CYAN = themas.colors.primary;
-const BG   = '#0A0E1A';
-const TEXT = themas.colors.white;
-
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: '#000',
   },
   scroll: {
-    padding: 20,
-    paddingTop: 12,
+    padding: 37,
+    paddingTop: 40,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 20,
-    marginTop: 8,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(0,255,255,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 24,
   },
   backIcon: {
-    color: CYAN,
-    fontSize: 18,
-    fontWeight: '700',
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '300',
+    lineHeight: 32,
+    marginTop: -4,
   },
   headerTitle: {
-    fontSize: 22,
+    color: '#fff',
+    fontSize: 26,
     fontWeight: '700',
-    color: TEXT,
-    letterSpacing: 0.3,
-  },
-  tabHint: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 24,
-  },
-  tabDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#2D3448',
-  },
-  tabDotActive: {
-    backgroundColor: CYAN,
-    width: 24,
-    borderRadius: 4,
   },
 });

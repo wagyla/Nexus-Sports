@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import {
   FormField,
-  FormCard,
   ChipSelector,
   PrimaryButton,
   RowFields,
@@ -22,8 +21,8 @@ const ESPORTES: ChipOption[] = [
   { label: 'Corrida', value: 'corrida' },
   { label: 'Tênis', value: 'tenis' },
   { label: 'Vôlei', value: 'volei' },
+  { label: 'Ciclismo', value: 'ciclismo' },
   { label: 'Futebol', value: 'futebol' },
-  { label: 'Natação', value: 'natacao' },
   { label: '+Outro', value: 'outro' },
 ];
 
@@ -35,23 +34,16 @@ const NIVEIS: ChipOption[] = [
 ];
 
 export default function CriarGrupoScreen({ navigation }: any) {
-  const [form, setForm] = useState({
-    nomeGrupo: '',
-    descricao: '',
-    data: '',
-    horario: '',
-    local: '',
-    vagas: '',
-    contatoEmail: '',
-  });
+  const [nomeGrupo, setNomeGrupo] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [data, setData] = useState('');
+  const [horario, setHorario] = useState('');
+  const [local, setLocal] = useState('');
+  const [vagas, setVagas] = useState('');
   const [esportes, setEsportes] = useState<string[]>([]);
   const [nivel, setNivel] = useState<string[]>([]);
   const [membros, setMembros] = useState<string[]>([]);
   const [novoMembro, setNovoMembro] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const set = (field: string) => (value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
 
   const toggleEsporte = (value: string) =>
     setEsportes((prev) =>
@@ -65,24 +57,12 @@ export default function CriarGrupoScreen({ navigation }: any) {
 
   const adicionarMembro = () => {
     const email = novoMembro.trim();
-    if (email && !membros.includes(email)) {
-      setMembros((prev) => [...prev, email]);
-      setNovoMembro('');
-    }
-  };
-
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.nomeGrupo.trim()) e.nomeGrupo = 'Informe o nome do grupo.';
-    if (!form.data.trim()) e.data = 'Informe a data.';
-    if (!form.local.trim()) e.local = 'Informe o local.';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setMembros((prev) => [...prev.filter((m) => m !== email), email].filter(Boolean));
+    setNovoMembro('');
   };
 
   const handleCriarGrupo = () => {
-    if (!validate()) return;
-    console.log({ ...form, esportes, nivel, membros });
+    console.log({ nomeGrupo, descricao, data, horario, local, vagas, esportes, nivel, membros });
   };
 
   return (
@@ -96,191 +76,146 @@ export default function CriarGrupoScreen({ navigation }: any) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {}
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={() => navigation?.goBack()}
-            >
-              <Text style={styles.backIcon}>←</Text>
+            <TouchableOpacity onPress={() => navigation?.goBack()}>
+              <Text style={styles.backIcon}>‹</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Criar Grupo</Text>
           </View>
 
-          <FormCard title="">
-            {}
-            <ChipSelector
-              label="Esportes"
-              options={ESPORTES}
-              selected={esportes}
-              onToggle={toggleEsporte}
-            />
+          <ChipSelector
+            label="Esportes"
+            options={ESPORTES}
+            selected={esportes}
+            onToggle={toggleEsporte}
+          />
 
-            {}
-            <ChipSelector
-              label="Nível"
-              options={NIVEIS}
-              selected={nivel}
-              onToggle={toggleNivel}
-            />
+          <FormField
+            label="Nome do Grupo"
+            placeholder="Ex: Futevôlei na Prainha"
+            value={nomeGrupo}
+            onChangeText={setNomeGrupo}
+          />
 
-            {}
-            <FormField
-              label="Nome do Grupo"
-              placeholder="Ex: Futebolistas da Prainha"
-              value={form.nomeGrupo}
-              onChangeText={set('nomeGrupo')}
-              error={errors.nomeGrupo}
-            />
+          <FormField
+            label="Descrição:"
+            placeholder="Ex: Corrida de 5km"
+            value={descricao}
+            onChangeText={setDescricao}
+            multiline
+            numberOfLines={3}
+            style={{ height: 80, textAlignVertical: 'top', paddingTop: 12 }}
+          />
 
-            {}
-            <FormField
-              label="Descrição"
-              placeholder="Ex: Corrida de Sem"
-              value={form.descricao}
-              onChangeText={set('descricao')}
-              multiline
-              numberOfLines={3}
-              style={{ height: 80, textAlignVertical: 'top' }}
-            />
-
-            {}
-            <RowFields>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Data"
-                  placeholder="dd/mm/aaaa"
-                  value={form.data}
-                  onChangeText={set('data')}
-                  error={errors.data}
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Horário"
-                  placeholder="00:00"
-                  value={form.horario}
-                  onChangeText={set('horario')}
-                  keyboardType="numeric"
-                />
-              </View>
-            </RowFields>
-
-            {}
-            <RowFields>
-              <View style={{ flex: 1 }}>
-                <FormField
-                  label="Local"
-                  placeholder="Ex: Praia"
-                  value={form.local}
-                  onChangeText={set('local')}
-                  error={errors.local}
-                />
-              </View>
-              <View style={{ flex: 0.5 }}>
-                <FormField
-                  label="Vagas"
-                  placeholder="20"
-                  value={form.vagas}
-                  onChangeText={set('vagas')}
-                  keyboardType="numeric"
-                />
-              </View>
-            </RowFields>
-
-            {}
-            <Text style={styles.sectionLabel}>ADICIONAR MEMBROS</Text>
-            <View style={styles.addMemberRow}>
+          <RowFields>
+            <View style={{ flex: 1 }}>
               <FormField
-                placeholder="Ex: seuemail@gmail.com"
-                value={novoMembro}
-                onChangeText={setNovoMembro}
-                containerStyle={{ flex: 1, marginBottom: 0 }}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                label="Data:"
+                placeholder="xx/xx/xxxx"
+                value={data}
+                onChangeText={setData}
+                keyboardType="numeric"
               />
-              <TouchableOpacity style={styles.addBtn} onPress={adicionarMembro}>
-                <Text style={styles.addBtnText}>+ Adicionar</Text>
-              </TouchableOpacity>
             </View>
+            <View style={{ flex: 1 }}>
+              <FormField
+                label="Horário:"
+                placeholder="xx:xx"
+                value={horario}
+                onChangeText={setHorario}
+                keyboardType="numeric"
+              />
+            </View>
+          </RowFields>
 
-            {membros.length > 0 && (
-              <View style={styles.membersList}>
-                {membros.map((m) => (
-                  <View key={m} style={styles.memberBadge}>
-                    <Text style={styles.memberText}>{m}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
+          <RowFields>
+            <View style={{ flex: 1 }}>
+              <FormField
+                label="Local:"
+                placeholder="Ex: Praia"
+                value={local}
+                onChangeText={setLocal}
+              />
+            </View>
+            <View style={{ flex: 0.5 }}>
+              <FormField
+                label="Vagas:"
+                placeholder="20"
+                value={vagas}
+                onChangeText={setVagas}
+                keyboardType="numeric"
+              />
+            </View>
+          </RowFields>
 
-            <PrimaryButton
-              title="Criar Grupo"
-              onPress={handleCriarGrupo}
-              style={{ marginTop: 20 }}
+          <Text style={styles.sectionLabel}>Adicionar membro:</Text>
+          <View style={styles.addMemberRow}>
+            <FormField
+              placeholder="Ex: exemplo@email.com"
+              value={novoMembro}
+              onChangeText={setNovoMembro}
+              containerStyle={{ flex: 1, marginBottom: 0 }}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-          </FormCard>
+            <TouchableOpacity style={styles.addBtn} onPress={adicionarMembro}>
+              <Text style={styles.addBtnText}>+ Adicionar</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.membersList}>
+            {membros.map((m) => (
+              <View key={m} style={styles.memberBadge}>
+                <Text style={styles.memberText}>{m}</Text>
+              </View>
+            ))}
+          </View>
+
+          <PrimaryButton
+            title="Criar Grupo"
+            onPress={handleCriarGrupo}
+            style={{ marginTop: 20 }}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-import { themas } from '../global/themes';
-
-const CYAN       = themas.colors.primary;
-const BG         = '#0A0E1A';
-const TEXT       = themas.colors.white;
-const TEXT_MUTED = '#718096';
-const SURFACE2   = '#222839';
-const BORDER     = '#2D3448';
-
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: '#000',
   },
   scroll: {
-    padding: 20,
-    paddingTop: 12,
+    padding: 37,
+    paddingTop: 40,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 20,
-    marginTop: 8,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(0,255,255,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 24,
   },
   backIcon: {
-    color: CYAN,
-    fontSize: 18,
-    fontWeight: '700',
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '300',
+    lineHeight: 32,
+    marginTop: -4,
   },
   headerTitle: {
-    fontSize: 22,
+    color: '#fff',
+    fontSize: 26,
     fontWeight: '700',
-    color: TEXT,
-    letterSpacing: 0.3,
   },
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: TEXT_MUTED,
-    marginBottom: 8,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+    color: '#fff',
+    fontSize: 14,
+    marginBottom: 6,
+    marginLeft: 2,
+    marginTop: 4,
   },
   addMemberRow: {
     flexDirection: 'row',
@@ -288,16 +223,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   addBtn: {
-    backgroundColor: 'rgba(0,255,255,0.15)',
+    backgroundColor: '#111',
     borderWidth: 1,
-    borderColor: CYAN,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
-    marginBottom: 12,
+    borderColor: '#00FFD1',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    marginBottom: 14,
   },
   addBtnText: {
-    color: CYAN,
+    color: '#00FFD1',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -305,18 +240,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 8,
+    marginTop: 4,
+    marginBottom: 4,
   },
   memberBadge: {
-    backgroundColor: SURFACE2,
-    borderRadius: 6,
+    backgroundColor: '#111',
+    borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: BORDER,
+    borderColor: '#333',
   },
   memberText: {
-    color: TEXT_MUTED,
+    color: '#aaa',
     fontSize: 12,
   },
 });
