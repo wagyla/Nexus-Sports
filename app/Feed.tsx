@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 
 import styles from "./feedStyle";
-import React from "react";
 const eventos = [
   {
     id: "1",

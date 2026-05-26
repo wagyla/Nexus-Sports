@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,34 +8,35 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
+} from "react-native";
 import {
   FormField,
   ChipSelector,
   PrimaryButton,
   RowFields,
   ChipOption,
-} from '@/src/componentes/Formulario';
+} from "@/src/componentes/Formulario";
+import { router } from "expo-router";
 
 const SPORTS: ChipOption[] = [
-  { label: 'Corrida', value: 'corrida' },
-  { label: 'Tênis', value: 'tenis' },
-  { label: 'Vôlei', value: 'volei' },
-  { label: 'Ciclismo', value: 'ciclismo' },
-  { label: 'Futebol', value: 'futebol' },
-  { label: '+Outro', value: 'outro' },
+  { label: "Corrida", value: "corrida" },
+  { label: "Tênis", value: "tenis" },
+  { label: "Vôlei", value: "volei" },
+  { label: "Ciclismo", value: "ciclismo" },
+  { label: "Futebol", value: "futebol" },
+  { label: "+Outro", value: "outro" },
 ];
 
 export default function CriarContaScreen({ navigation }: any) {
-  const [nomeCompleto, setNomeCompleto] = useState('');
-  const [email, setEmail] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [senha, setSenha] = useState('');
+  const [nomeCompleto, setNomeCompleto] = useState("");
+  const [email, setEmail] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [senha, setSenha] = useState("");
   const [esportesFavoritos, setEsportesFavoritos] = useState<string[]>([]);
 
   const toggleEsporte = (value: string) => {
     setEsportesFavoritos((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
   };
 
@@ -47,7 +48,7 @@ export default function CriarContaScreen({ navigation }: any) {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
@@ -110,7 +111,7 @@ export default function CriarContaScreen({ navigation }: any) {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Já tem uma conta? </Text>
-            <TouchableOpacity onPress={() => navigation?.navigate('Login')}>
+            <TouchableOpacity onPress={() => router.push("/login")}>
               <Text style={styles.footerLink}>Entrar</Text>
             </TouchableOpacity>
           </View>
@@ -123,7 +124,7 @@ export default function CriarContaScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   scroll: {
     padding: 37,
@@ -131,28 +132,28 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   title: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 26,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 2,
   },
   subtitle: {
-    color: '#aaa',
+    color: "#aaa",
     fontSize: 13,
     marginBottom: 24,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
   },
   footerText: {
-    color: '#aaa',
+    color: "#aaa",
     fontSize: 14,
   },
   footerLink: {
-    color: '#00FFD1',
+    color: "#00FFD1",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
