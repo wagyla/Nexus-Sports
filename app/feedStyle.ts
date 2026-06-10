@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
   },
-  header: {
+  cabecalho: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

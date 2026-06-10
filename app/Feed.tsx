@@ -1,6 +1,9 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 
 import styles from "./feedStyle";
+import Navbar from "@/src/componentes/Navbar";
+import { router } from "expo-router";
+import React from "react";
 const eventos = [
   {
     id: "1",
@@ -59,16 +62,18 @@ const eventos = [
 export default function Feed() {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.cabecalho}>
         <View>
           <Text style={styles.saudacao}>Olá, Léo!</Text>
           <Text style={styles.subtitulo}> Eventos perto de você!</Text>
         </View>
-        <View style={styles.avatar}>
+        <TouchableOpacity
+          style={styles.avatar}
+          onPress={() => router.push("/Perfil")}
+        >
           <Text style={styles.avatarTexto}>LP</Text>
-        </View>
+        </TouchableOpacity>
       </View>
-
       <View style={styles.filtros}>
         <TouchableOpacity style={[styles.tag, styles.tagAtiva]}>
           <Text style={styles.tagTextoAtivo}>Todos</Text>
@@ -83,8 +88,11 @@ export default function Feed() {
           <Text style={styles.tagTexto}>Vôlei</Text>
         </TouchableOpacity>
       </View>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 80 }}
+      >
         {eventos.map((evento) => (
           <View key={evento.id} style={styles.card}>
             <View style={styles.cardTopo}>
@@ -128,6 +136,7 @@ export default function Feed() {
           </View>
         ))}
       </ScrollView>
+      <Navbar itemAtivo="feed" />
     </View>
   );
 }
