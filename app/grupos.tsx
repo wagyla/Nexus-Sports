@@ -7,8 +7,6 @@ import {
   StyleSheet,
   StatusBar,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHouse, faUsers, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "@/src/componentes/Navbar";
 import { router } from "expo-router";
 
@@ -74,7 +72,7 @@ export default function GruposScreen() {
             <View style={estilos.cardInfo}>
               <Text style={estilos.cardNome}>{grupo.nome}</Text>
               <Text style={estilos.cardDetalhe}>
-                {grupo.membros} membros · {grupo.eventos} evento
+                {grupo.membros} membros * {grupo.eventos} evento
                 {grupo.eventos > 1 ? "s" : ""}
               </Text>
 
@@ -115,7 +113,7 @@ export default function GruposScreen() {
 }
 
 export const estilos = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1a1a1a" },
+  container: { flex: 1, backgroundColor: "#0D0D0D", paddingTop: 40 },
   cabecalho: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -142,7 +140,7 @@ export const estilos = StyleSheet.create({
     paddingBottom: 8,
   },
   card: {
-    backgroundColor: "#252525",
+    backgroundColor: "#1a1a1a",
     marginHorizontal: 16,
     marginVertical: 4,
     borderRadius: 12,
