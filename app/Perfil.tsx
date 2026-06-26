@@ -59,13 +59,13 @@ export default function Perfil() {
       <View style={styles.cabecalho}>
         <TouchableOpacity
           style={styles.botaoVoltar}
-          onPress={() => router.back()}
+          onPress={() => router.push("/Feed")}
         >
           <Text style={styles.botaoVoltarTexto}>{"<"}</Text>
           <Text style={styles.Titulo}>Perfil</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.botaoEditar}>
-          <FontAwesomeIcon icon={faPencil} size={14} color="#00E5FF" />
+          <FontAwesomeIcon icon={faPencil} size={14} color="#00FFFF" />
           <Text style={styles.botaoEditarTexto}>Editar</Text>
         </TouchableOpacity>
       </View>
@@ -131,8 +131,8 @@ export default function Perfil() {
             </View>
           </View>
         ))}
-        <Navbar itemAtivo="feed" />
       </ScrollView>
+      <Navbar itemAtivo="feed" />
     </View>
   );
 }
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0D0D0D",
     paddingTop: 60,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   cabecalho: {
     flexDirection: "row",
@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   tag: {
-    backgroundColor: "#00E5FF",
+    backgroundColor: "#00E5FF33",
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },
   tagTexto: {
-    color: "#000000",
+    color: "#00E5FF",
     fontSize: 12,
     fontWeight: "bold",
   },

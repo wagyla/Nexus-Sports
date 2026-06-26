@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,61 +8,72 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
+} from "react-native";
 import {
   FormField,
   ChipSelector,
   PrimaryButton,
   RowFields,
   ChipOption,
-} from '@/src/componentes/Formulario';
+} from "@/src/componentes/Formulario";
+import { router } from "expo-router";
 
 const ESPORTES: ChipOption[] = [
-  { label: 'Corrida', value: 'corrida' },
-  { label: 'Tênis', value: 'tenis' },
-  { label: 'Vôlei', value: 'volei' },
-  { label: 'Ciclismo', value: 'ciclismo' },
-  { label: 'Futebol', value: 'futebol' },
-  { label: '+Outro', value: 'outro' },
+  { label: "Corrida", value: "corrida" },
+  { label: "Tênis", value: "tenis" },
+  { label: "Vôlei", value: "volei" },
+  { label: "Ciclismo", value: "ciclismo" },
+  { label: "Futebol", value: "futebol" },
+  { label: "+Outro", value: "outro" },
 ];
 
 const NIVEIS: ChipOption[] = [
-  { label: 'Iniciante', value: 'iniciante' },
-  { label: 'Recreação', value: 'recreacao' },
-  { label: 'Avançado', value: 'avancado' },
-  { label: '+Outro', value: 'outro' },
+  { label: "Iniciante", value: "iniciante" },
+  { label: "Recreação", value: "recreacao" },
+  { label: "Avançado", value: "avancado" },
+  { label: "+Outro", value: "outro" },
 ];
 
 export default function CriarEventoScreen({ navigation }: any) {
-  const [nomeEvento, setNomeEvento] = useState('');
-  const [grupoOrganizador, setGrupoOrganizador] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [data, setData] = useState('');
-  const [horario, setHorario] = useState('');
-  const [local, setLocal] = useState('');
-  const [vagas, setVagas] = useState('');
+  const [nomeEvento, setNomeEvento] = useState("");
+  const [grupoOrganizador, setGrupoOrganizador] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [data, setData] = useState("");
+  const [horario, setHorario] = useState("");
+  const [local, setLocal] = useState("");
+  const [vagas, setVagas] = useState("");
   const [esportes, setEsportes] = useState<string[]>([]);
   const [nivel, setNivel] = useState<string[]>([]);
 
   const toggleEsporte = (value: string) =>
     setEsportes((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
 
   const toggleNivel = (value: string) =>
     setNivel((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
 
   const handleCriarEvento = () => {
-    console.log({ nomeEvento, grupoOrganizador, descricao, data, horario, local, vagas, esportes, nivel });
+    console.log({
+      nomeEvento,
+      grupoOrganizador,
+      descricao,
+      data,
+      horario,
+      local,
+      vagas,
+      esportes,
+      nivel,
+    });
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
@@ -70,7 +81,7 @@ export default function CriarEventoScreen({ navigation }: any) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation?.goBack()}>
+            <TouchableOpacity onPress={() => router.back()}>
               <Text style={styles.backIcon}>‹</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Criar Evento</Text>
@@ -104,7 +115,7 @@ export default function CriarEventoScreen({ navigation }: any) {
             onChangeText={setDescricao}
             multiline
             numberOfLines={3}
-            style={{ height: 80, textAlignVertical: 'top', paddingTop: 12 }}
+            style={{ height: 80, textAlignVertical: "top", paddingTop: 12 }}
           />
 
           <RowFields>
@@ -162,7 +173,7 @@ export default function CriarEventoScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   scroll: {
     padding: 37,
@@ -170,21 +181,21 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     marginBottom: 24,
   },
   backIcon: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 32,
-    fontWeight: '300',
+    fontWeight: "300",
     lineHeight: 32,
     marginTop: -4,
   },
   headerTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 26,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });
