@@ -1,6 +1,12 @@
-// Feed.jsx — substitua o arquivo completo
-
-import { View, Text, ScrollView, TouchableOpacity, Modal, Animated, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Animated,
+  Pressable,
+} from "react-native";
 import styles from "./feedStyle";
 import Navbar from "@/src/componentes/Navbar";
 import { router } from "expo-router";
@@ -70,87 +76,126 @@ function ModalEvento({ evento, visivel, onFechar }) {
   const vagasRestantes = evento.total - evento.participantes.length;
 
   return (
-    <Modal transparent visible={visivel} animationType="none" onRequestClose={onFechar}>
+    <Modal
+      transparent
+      visible={visivel}
+      animationType="none"
+      onRequestClose={onFechar}
+    >
       <Pressable style={estilosModal.overlay} onPress={onFechar}>
         <Animated.View
-          style={[estilosModal.sheet, { transform: [{ translateY: slideAnim }] }]}
+          style={[
+            estilosModal.sheet,
+            { transform: [{ translateY: slideAnim }] },
+          ]}
         >
           <Pressable onPress={() => {}}>
-            {/* Handle */}
             <View style={estilosModal.handle} />
 
-            {/* Cabeçalho */}
             <View style={estilosModal.cabecalhoModal}>
-              <View style={[estilosModal.tagEsporte, { backgroundColor: evento.cor + "33" }]}>
-                <Text style={[estilosModal.tagEsporteTexto, { color: evento.cor }]}>
+              <View
+                style={[
+                  estilosModal.tagEsporte,
+                  { backgroundColor: evento.cor + "33" },
+                ]}
+              >
+                <Text
+                  style={[estilosModal.tagEsporteTexto, { color: evento.cor }]}
+                >
                   {evento.esporte}
                 </Text>
               </View>
-              <TouchableOpacity onPress={onFechar} style={estilosModal.botaoFechar}>
+              <TouchableOpacity
+                onPress={onFechar}
+                style={estilosModal.botaoFechar}
+              >
                 <Text style={estilosModal.botaoFecharTexto}>✕</Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={estilosModal.titulo}>{evento.nome}</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={estilosModal.titulo}>{evento.nome}</Text>
 
-            <View style={estilosModal.divisor} />
+              <View style={estilosModal.divisor} />
 
-            {/* Data e hora */}
-            <Text style={estilosModal.rotulo}>DATA E HORA</Text>
-            <Text style={estilosModal.valor}>{evento.dataCompleta} • {evento.hora}</Text>
+              <Text style={estilosModal.rotulo}>DATA E HORA</Text>
+              <Text style={estilosModal.valor}>
+                {evento.dataCompleta} · {evento.hora}
+              </Text>
 
-            {/* Localização */}
-            <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>LOCALIZAÇÃO</Text>
-            <Text style={estilosModal.valor}>{evento.endereco}</Text>
-            <Text style={estilosModal.subvalor}>{evento.cidade}</Text>
+              <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>
+                LOCALIZAÇÃO
+              </Text>
+              <Text style={estilosModal.valor}>{evento.endereco}</Text>
+              <Text style={estilosModal.subvalor}>{evento.cidade}</Text>
 
-            {/* Grupo */}
-            <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>GRUPO</Text>
-            <Text style={[estilosModal.valor, { color: "#00d4ff" }]}>{evento.grupo}</Text>
+              <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>
+                GRUPO
+              </Text>
+              <Text style={[estilosModal.valor, { color: "#00FFD1" }]}>
+                {evento.grupo}
+              </Text>
 
-            {/* Criador */}
-            <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>CRIADO POR</Text>
-            <View style={estilosModal.criadorRow}>
-              <View style={[estilosModal.avatarCriador, { backgroundColor: evento.criador.corAvatar }]}>
-                <Text style={estilosModal.avatarCriadorTexto}>{evento.criador.iniciais}</Text>
-              </View>
-              <View>
-                <Text style={estilosModal.criadorNome}>{evento.criador.nome}</Text>
-                <Text style={estilosModal.criadorRole}>Organizador</Text>
-              </View>
-            </View>
-
-            <View style={estilosModal.divisor} />
-
-            {/* Descrição */}
-            <Text style={estilosModal.rotulo}>DESCRIÇÃO</Text>
-            <Text style={estilosModal.descricao}>{evento.descricao}</Text>
-
-            {/* Participantes */}
-            <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>
-              PARTICIPANTES ({evento.participantes.length}/{evento.total})
-            </Text>
-            <View style={estilosModal.participantesRow}>
-              {evento.participantes.map((p, i) => (
+              <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>
+                CRIADO POR
+              </Text>
+              <View style={estilosModal.criadorRow}>
                 <View
-                  key={i}
                   style={[
-                    estilosModal.miniAvatar,
-                    { backgroundColor: evento.coresAvatar[i], marginLeft: i === 0 ? 0 : -8 },
+                    estilosModal.avatarCriador,
+                    { backgroundColor: evento.criador.corAvatar },
                   ]}
                 >
-                  <Text style={estilosModal.miniAvatarTexto}>{p}</Text>
+                  <Text style={estilosModal.avatarCriadorTexto}>
+                    {evento.criador.iniciais}
+                  </Text>
                 </View>
-              ))}
-              <Text style={estilosModal.vagasTexto}>
-                +{vagasRestantes} vaga{vagasRestantes !== 1 ? "s" : ""} restante{vagasRestantes !== 1 ? "s" : ""}
-              </Text>
-            </View>
+                <View>
+                  <Text style={estilosModal.criadorNome}>
+                    {evento.criador.nome}
+                  </Text>
+                  <Text style={estilosModal.criadorRole}>Organizador</Text>
+                </View>
+              </View>
 
-            {/* Botão CTA */}
-            <TouchableOpacity style={estilosModal.botaoParticipar}>
-              <Text style={estilosModal.botaoParticiparTexto}>Participar do Evento</Text>
-            </TouchableOpacity>
+              <View style={estilosModal.divisor} />
+
+              <Text style={estilosModal.rotulo}>DESCRIÇÃO</Text>
+              <Text style={estilosModal.descricao}>{evento.descricao}</Text>
+
+              <Text style={[estilosModal.rotulo, { marginTop: 20 }]}>
+                PARTICIPANTES ({evento.participantes.length}/{evento.total})
+              </Text>
+              <View style={estilosModal.participantesRow}>
+                {evento.participantes.map((p, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      estilosModal.miniAvatar,
+                      {
+                        backgroundColor: evento.coresAvatar[i],
+                        marginLeft: i === 0 ? 0 : -8,
+                      },
+                    ]}
+                  >
+                    <Text style={estilosModal.miniAvatarTexto}>{p}</Text>
+                  </View>
+                ))}
+                <Text style={estilosModal.vagasTexto}>
+                  +{vagasRestantes} vaga{vagasRestantes !== 1 ? "s" : ""}{" "}
+                  restante{vagasRestantes !== 1 ? "s" : ""}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={estilosModal.botaoParticipar}
+                onPress={onFechar}
+              >
+                <Text style={estilosModal.botaoParticiparTexto}>
+                  Participar do Evento
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
           </Pressable>
         </Animated.View>
       </Pressable>
@@ -161,6 +206,7 @@ function ModalEvento({ evento, visivel, onFechar }) {
 export default function Feed() {
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [filtroAtivo, setFiltroAtivo] = useState("Todos");
 
   const abrirModal = (evento) => {
     setEventoSelecionado(evento);
@@ -169,31 +215,42 @@ export default function Feed() {
 
   const fecharModal = () => setModalVisivel(false);
 
+  const filtros = ["Todos", "Corrida", "Ciclismo", "Tênis", "Vôlei"];
+
+  const eventosFiltrados =
+    filtroAtivo === "Todos"
+      ? eventos
+      : eventos.filter((e) => e.esporte === filtroAtivo);
+
   return (
     <View style={styles.container}>
       <View style={styles.cabecalho}>
         <View>
           <Text style={styles.saudacao}>Olá, Léo!</Text>
-          <Text style={styles.subtitulo}> Eventos perto de você!</Text>
+          <Text style={styles.subtitulo}>Eventos perto de você!</Text>
         </View>
-        <TouchableOpacity style={styles.avatar} onPress={() => router.push("/Perfil")}>
+        <TouchableOpacity
+          style={styles.avatar}
+          onPress={() => router.push("/Perfil")}
+        >
           <Text style={styles.avatarTexto}>LP</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.filtros}>
-        <TouchableOpacity style={[styles.tag, styles.tagAtiva]}>
-          <Text style={styles.tagTextoAtivo}>Todos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tag}>
-          <Text style={styles.tagTexto}>Corrida</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tag}>
-          <Text style={styles.tagTexto}>Tênis</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tag}>
-          <Text style={styles.tagTexto}>Vôlei</Text>
-        </TouchableOpacity>
+        {filtros.map((f) => (
+          <TouchableOpacity
+            key={f}
+            style={[styles.tag, filtroAtivo === f && styles.tagAtiva]}
+            onPress={() => setFiltroAtivo(f)}
+          >
+            <Text
+              style={filtroAtivo === f ? styles.tagTextoAtivo : styles.tagTexto}
+            >
+              {f}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       <ScrollView
@@ -201,36 +258,57 @@ export default function Feed() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        {eventos.map((evento, index) => (
-          <View key={`${evento.id}-${index}`} style={styles.card}>
-            <View style={styles.cardTopo}>
-              <View style={[styles.esporteTag, { backgroundColor: evento.cor + "33" }]}>
-                <Text style={[styles.esporteTexto, { color: evento.cor }]}>{evento.esporte}</Text>
+        {eventosFiltrados.length === 0 ? (
+          <Text style={{ color: "#888", textAlign: "center", marginTop: 40 }}>
+            Nenhum evento encontrado para "{filtroAtivo}"
+          </Text>
+        ) : (
+          eventosFiltrados.map((evento, index) => (
+            <View key={`${evento.id}-${index}`} style={styles.card}>
+              <View style={styles.cardTopo}>
+                <View
+                  style={[
+                    styles.esporteTag,
+                    { backgroundColor: evento.cor + "33" },
+                  ]}
+                >
+                  <Text style={[styles.esporteTexto, { color: evento.cor }]}>
+                    {evento.esporte}
+                  </Text>
+                </View>
+                <View style={styles.dataHora}>
+                  <Text style={styles.data}>{evento.data}</Text>
+                  <Text style={styles.separador}>·</Text>
+                  <Text style={styles.hora}>{evento.hora}</Text>
+                </View>
               </View>
-              <View style={styles.dataHora}>
-                <Text style={styles.data}>{evento.data}</Text>
-                <Text style={styles.separador}>*</Text>
-                <Text style={styles.hora}>{evento.hora}</Text>
+              <Text style={styles.nomeEvento}>{evento.nome}</Text>
+              <Text style={styles.endereco}>{evento.endereco}</Text>
+              <View style={styles.cardRodape}>
+                <View style={styles.participantes}>
+                  {evento.participantes.map((p, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.miniAvatar,
+                        { marginLeft: i === 0 ? 0 : -8 },
+                      ]}
+                    >
+                      <Text style={styles.miniAvatarTexto}>{p}</Text>
+                    </View>
+                  ))}
+                  <Text style={styles.totalParticipantes}>+{evento.total}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.botaoVer}
+                  onPress={() => abrirModal(evento)}
+                >
+                  <Text style={styles.botaoVerTexto}>Ver</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <Text style={styles.nomeEvento}>{evento.nome}</Text>
-            <Text style={styles.endereco}>{evento.endereco}</Text>
-            <View style={styles.cardRodape}>
-              <View style={styles.participantes}>
-                {evento.participantes.map((p, i) => (
-                  <View key={i} style={[styles.miniAvatar, { marginLeft: i === 0 ? 0 : -8 }]}>
-                    <Text style={styles.miniAvatarTexto}>{p}</Text>
-                  </View>
-                ))}
-                <Text style={styles.totalParticipantes}>+{evento.total}</Text>
-              </View>
-              {/* BOTÃO VER — abre o modal */}
-              <TouchableOpacity style={styles.botaoVer} onPress={() => abrirModal(evento)}>
-                <Text style={styles.botaoVerTexto}>Ver</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
 
       <Navbar itemAtivo="feed" />
@@ -244,7 +322,6 @@ export default function Feed() {
   );
 }
 
-// Estilos do modal (adicione junto ao feedStyle ou inline aqui)
 const estilosModal = {
   overlay: {
     flex: 1,
@@ -252,16 +329,17 @@ const estilosModal = {
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: "#0a0a0a",
+    backgroundColor: "#111",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
     paddingBottom: 36,
+    maxHeight: "90%",
   },
   handle: {
     width: 48,
     height: 4,
-    backgroundColor: "#3a3a5c",
+    backgroundColor: "#333",
     borderRadius: 2,
     alignSelf: "center",
     marginBottom: 16,
@@ -285,12 +363,12 @@ const estilosModal = {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#2a2a4a",
+    backgroundColor: "#222",
     alignItems: "center",
     justifyContent: "center",
   },
   botaoFecharTexto: {
-    color: "#8888aa",
+    color: "#888",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -302,11 +380,11 @@ const estilosModal = {
   },
   divisor: {
     height: 1,
-    backgroundColor: "#1e1e2e",
+    backgroundColor: "#1A1A1A",
     marginVertical: 16,
   },
   rotulo: {
-    color: "#8888aa",
+    color: "#888",
     fontSize: 11,
     fontWeight: "600",
     letterSpacing: 1,
@@ -318,7 +396,7 @@ const estilosModal = {
     fontWeight: "500",
   },
   subvalor: {
-    color: "#5a5a7a",
+    color: "#555",
     fontSize: 12,
     marginTop: 2,
   },
@@ -346,11 +424,11 @@ const estilosModal = {
     fontWeight: "600",
   },
   criadorRole: {
-    color: "#5a5a7a",
+    color: "#555",
     fontSize: 12,
   },
   descricao: {
-    color: "#ccccdd",
+    color: "#ccc",
     fontSize: 13,
     lineHeight: 20,
     marginTop: 4,
@@ -367,7 +445,7 @@ const estilosModal = {
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#1e1e2e",
+    borderColor: "#1A1A1A",
   },
   miniAvatarTexto: {
     color: "#fff",
@@ -375,19 +453,19 @@ const estilosModal = {
     fontWeight: "700",
   },
   vagasTexto: {
-    color: "#5a5a7a",
+    color: "#555",
     fontSize: 13,
     marginLeft: 10,
   },
   botaoParticipar: {
-    backgroundColor: "#00d4ff",
+    backgroundColor: "#00FFD1",
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 24,
   },
   botaoParticiparTexto: {
-    color: "#0a0a1a",
+    color: "#000",
     fontSize: 16,
     fontWeight: "700",
   },
