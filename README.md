@@ -1,51 +1,85 @@
-# Welcome to your Expo app 👋
+# SportGroup
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile para conectar pessoas que querem praticar esportes em grupo.
 
-## Get started
+Desenvolvido com Expo (React Native) e Supabase.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Tecnologias
 
-2. Start the app
+- Expo / React Native
+- Supabase
+- Expo Router
+- AsyncStorage
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Instalação
 
 ```bash
-npm run reset-project
+npm install
+npx expo install @supabase/supabase-js
+npx expo install @react-native-async-storage/async-storage
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Variáveis de ambiente
 
-To learn more about developing your project with Expo, look at the following resources:
+Crie um arquivo `.env.local` na raiz do projeto:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+EXPO_PUBLIC_SUPABASE_KEY=sua-key-aqui
+```
 
-## Join the community
+Os valores estão em Supabase Dashboard > Settings > API.
 
-Join our community of developers creating universal apps.
+Nunca suba o `.env.local` para o repositório.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# ifzap_20262
+---
+
+## Banco de dados
+
+Tabelas no Supabase, nessa ordem de criação:
+
+1. `usuarios` — perfil público vinculado ao auth.users
+2. `grupos` — grupos esportivos
+3. `membros_grupo` — relação usuário x grupo
+4. `eventos` — eventos criados dentro dos grupos
+5. `participantes_evento` — inscrições nos eventos
+
+Ative o RLS em todas as tabelas.
+
+---
+
+## Conexão com o Supabase
+
+Arquivo em `src/lib/supabase.ts`:
+
+```ts
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createClient } from '@supabase/supabase-js'
+
+export const supabase = createClient(
+  process.env.EXPO_PUBLIC_SUPABASE_URL!,
+  process.env.EXPO_PUBLIC_SUPABASE_KEY!,
+  {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  }
+)
+```
+
+---
+
+## Rodando o projeto
+
+```bash
+npx expo start
+```
