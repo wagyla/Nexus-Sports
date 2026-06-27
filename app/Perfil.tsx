@@ -1,4 +1,4 @@
-import react from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -18,11 +18,11 @@ const usuario = {
   iniciais: "LP",
   eventos: 10,
   grupos: 2,
-  consquistas: 8,
+  conquistas: 8,
   esportesFavoritos: [
-    { nome: "corrida", cor: "#FF4444" },
-    { nome: "capoeira", cor: "#FF8800" },
-    { nome: "Vôlei", cor: "#00E5FF" },
+    { nome: "Corrida", cor: "#FF4444" },
+    { nome: "Capoeira", cor: "#FF8800" },
+    { nome: "Vôlei", cor: "#00FFD1" },
     { nome: "Natação", cor: "#FF4444" },
   ],
   atividadesRecentes: [
@@ -35,10 +35,9 @@ const usuario = {
     {
       titulo: "Pedalada Matinal",
       data: "12 Abr",
-      distancia: "5km",
+      distancia: "20km",
       status: "Concluído",
     },
-
     {
       titulo: "Corrida Porto",
       data: "12 Abr",
@@ -48,6 +47,7 @@ const usuario = {
     {
       titulo: "Pilates fisocore",
       data: "12 Abr",
+      distancia: "",
       status: "Concluído",
     },
   ],
@@ -56,19 +56,24 @@ const usuario = {
 export default function Perfil() {
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#0D0D0D" />
       <View style={styles.cabecalho}>
         <TouchableOpacity
           style={styles.botaoVoltar}
-          onPress={() => router.push("/Feed")}
+          onPress={() => router.back()}
         >
-          <Text style={styles.botaoVoltarTexto}>{"<"}</Text>
-          <Text style={styles.Titulo}>Perfil</Text>
+          <Text style={styles.botaoVoltarTexto}>‹</Text>
+          <Text style={styles.titulo}>Perfil</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.botaoEditar}>
-          <FontAwesomeIcon icon={faPencil} size={14} color="#00FFFF" />
+        <TouchableOpacity
+          style={styles.botaoEditar}
+          onPress={() => router.push("/EditarPerfil")}
+        >
+          <FontAwesomeIcon icon={faPencil} size={14} color="#00FFD1" />
           <Text style={styles.botaoEditarTexto}>Editar</Text>
         </TouchableOpacity>
       </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -86,22 +91,21 @@ export default function Perfil() {
             <Text style={styles.estatNumero}>{usuario.eventos}</Text>
             <Text style={styles.estatRotulo}>Eventos</Text>
           </View>
-
           <View style={styles.cartaoEstat}>
             <Text style={[styles.estatNumero, { color: "#FF8800" }]}>
               {usuario.grupos}
             </Text>
             <Text style={styles.estatRotulo}>Grupos</Text>
           </View>
-
           <View style={styles.cartaoEstat}>
-            <Text style={[styles.estatNumero, { color: "#00E5FF" }]}>
-              {usuario.consquistas}
+            <Text style={[styles.estatNumero, { color: "#00FFD1" }]}>
+              {usuario.conquistas}
             </Text>
             <Text style={styles.estatRotulo}>Conquistas</Text>
           </View>
         </View>
-        <Text style={styles.secaoTitulo}> Esportes Favoritos:</Text>
+
+        <Text style={styles.secaoTitulo}>Esportes Favoritos</Text>
         <View style={styles.esportes}>
           {usuario.esportesFavoritos.map((esporte, index) => (
             <View
@@ -117,13 +121,15 @@ export default function Perfil() {
             </View>
           ))}
         </View>
-        <Text style={styles.secaoTitulo}> Atividades Recentes:</Text>
+
+        <Text style={styles.secaoTitulo}>Atividades Recentes</Text>
         {usuario.atividadesRecentes.map((atividade, index) => (
           <View key={index} style={styles.card}>
             <View>
               <Text style={styles.cardTitulo}>{atividade.titulo}</Text>
               <Text style={styles.cardDetalhe}>
-                {atividade.data} · {atividade.distancia}
+                {atividade.data}
+                {atividade.distancia ? ` · ${atividade.distancia}` : ""}
               </Text>
             </View>
             <View style={styles.tag}>
@@ -132,7 +138,8 @@ export default function Perfil() {
           </View>
         ))}
       </ScrollView>
-      <Navbar itemAtivo="feed" />
+
+      <Navbar itemAtivo="perfil" />
     </View>
   );
 }
@@ -157,10 +164,12 @@ const styles = StyleSheet.create({
   },
   botaoVoltarTexto: {
     color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 32,
+    fontWeight: "300",
+    lineHeight: 32,
+    marginTop: -4,
   },
-  Titulo: {
+  titulo: {
     color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "bold",
@@ -171,34 +180,30 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   botaoEditarTexto: {
-    color: "#00E5FF",
+    color: "#00FFD1",
     fontSize: 14,
-    fontWeight: "medium",
+    fontWeight: "600",
   },
-
   avatarContainer: {
     alignItems: "center",
     marginBottom: 28,
   },
-
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#00E5FF33",
+    backgroundColor: "#00FFD133",
     borderWidth: 1.5,
-    borderColor: "#00E5FF",
+    borderColor: "#00FFD1",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
   },
-
   avatarTexto: {
-    color: "#00E5FF",
+    color: "#00FFD1",
     fontSize: 26,
     fontWeight: "bold",
   },
-
   nome: {
     color: "#ffffff",
     fontSize: 18,
@@ -209,7 +214,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
-
   estatistica: {
     flexDirection: "row",
     gap: 10,
@@ -232,19 +236,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
-
   secaoTitulo: {
     color: "#888888",
     fontSize: 13,
     marginBottom: 10,
+    marginLeft: 4,
   },
   esportes: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
     marginBottom: 24,
-    alignItems: "center",
-    justifyContent: "center",
   },
   esporteTag: {
     paddingHorizontal: 14,
@@ -275,13 +277,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   tag: {
-    backgroundColor: "#00E5FF33",
+    backgroundColor: "#00FFD133",
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },
   tagTexto: {
-    color: "#00E5FF",
+    color: "#00FFD1",
     fontSize: 12,
     fontWeight: "bold",
   },
