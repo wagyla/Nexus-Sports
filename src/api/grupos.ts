@@ -57,3 +57,14 @@ export const countMeusGrupos = async (userId: string): ApiResult<number> => {
   if (error) return { data: undefined, error: error.message };
   return { data: count ?? 0, error: undefined };
 };
+
+export const deleteGrupo = async (grupoId: string, userId: string): ApiResult<null> => {
+  const { error } = await supabase
+    .from(TABELA)
+    .delete()
+    .eq("id", grupoId)
+    .eq("criado_por", userId);
+
+  if (error) return { data: undefined, error: error.message };
+  return { data: null, error: undefined };
+};

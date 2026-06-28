@@ -13,7 +13,18 @@ import FeedFiltros from "@/src/components/FeedFiltros";
 import EventoCard from "@/src/components/EventoCard";
 import ModalEvento from "@/src/components/ModalEvento";
 
-const FILTROS = ["Todos", "Corrida", "Ciclismo", "Tênis", "Vôlei"];
+const NOME_ESPORTE: Record<string, string> = {
+  corrida: "Corrida",
+  ciclismo: "Ciclismo",
+  tenis: "Tênis",
+  volei: "Vôlei",
+  futebol: "Futebol",
+  natacao: "Natação",
+  outro: "Outro",
+};
+
+const nomeFiltro = (esporte: string): string =>
+  NOME_ESPORTE[esporte] ?? esporte.charAt(0).toUpperCase() + esporte.slice(1);
 
 const Feed = () => {
   const { user } = useAuth();
@@ -36,6 +47,7 @@ const Feed = () => {
       console.error("Erro ao carregar eventos:", error);
     } else {
       setEventos((data ?? []).map(mapEvento));
+      setFiltroAtivo("Todos");
     }
 
     setCarregando(false);
@@ -61,10 +73,13 @@ const Feed = () => {
     );
   };
 
+  const esportesUnicos = [...new Set(eventos.map((e) => e.esporte).filter(Boolean))];
+  const filtros = ["Todos", ...esportesUnicos.map(nomeFiltro)];
+
   const eventosFiltrados =
     filtroAtivo === "Todos"
       ? eventos
-      : eventos.filter((e) => e.esporte === filtroAtivo);
+      : eventos.filter((e) => nomeFiltro(e.esporte) === filtroAtivo);
 
   return (
     <View style={styles.container}>
@@ -75,7 +90,7 @@ const Feed = () => {
       />
 
       <FeedFiltros
-        filtros={FILTROS}
+        filtros={filtros}
         filtroAtivo={filtroAtivo}
         onSelectFiltro={setFiltroAtivo}
       />

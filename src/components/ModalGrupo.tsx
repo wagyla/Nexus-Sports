@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { deleteGrupo } from "@/src/api/grupos";
 import type { GrupoDisplay } from "@/src/types";
 
 type Props = {
@@ -19,6 +21,7 @@ type Props = {
   visivel: boolean;
   isMembro: boolean;
   onFechar: () => void;
+  onDeletado?: () => void;
 };
 
 const InfoLinha = ({ rotulo, valor }: { rotulo: string; valor: string }) => (
@@ -28,8 +31,10 @@ const InfoLinha = ({ rotulo, valor }: { rotulo: string; valor: string }) => (
   </>
 );
 
-const ModalGrupo = ({ grupo, visivel, isMembro, onFechar }: Props) => {
+const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado }: Props) => {
   const slideAnim = useRef(new Animated.Value(600)).current;
+  const { user } = useAuth();
+  const [excluindo, setExcluindo] = useState(false);
 
   useEffect(() => {
     if (visivel) {
@@ -49,6 +54,32 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar }: Props) => {
   }, [visivel]);
 
   if (!grupo) return null;
+
+  const handleExcluir = () => {
+    Alert.alert(
+      "Excluir grupo",
+      `Tem certeza que deseja excluir "${grupo.nome}"? Esta ação não pode ser desfeita.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            if (!user) return;
+            setExcluindo(true);
+            const { error } = await deleteGrupo(grupo.id, user.id);
+            setExcluindo(false);
+            if (error) {
+              Alert.alert("Erro", "Não foi possível excluir o grupo.");
+              return;
+            }
+            onFechar();
+            onDeletado?.();
+          },
+        },
+      ]
+    );
+  };
 
   const onSair = () => {
     onFechar();
@@ -116,7 +147,18 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar }: Props) => {
                 </>
               )}
 
-              {isMembro ? (
+              {grupo.isAdmin ? (
+                <TouchableOpacity
+                  style={estilos.botaoExcluir}
+                  onPress={handleExcluir}
+                  disabled={excluindo}
+                  activeOpacity={0.7}
+                >
+                  <Text style={estilos.botaoExcluirTexto}>
+                    {excluindo ? "Excluindo..." : "Excluir Grupo"}
+                  </Text>
+                </TouchableOpacity>
+              ) : isMembro ? (
                 <TouchableOpacity style={estilos.botaoSair} onPress={onSair}>
                   <Text style={estilos.botaoSairTexto}>Sair do Grupo</Text>
                 </TouchableOpacity>
@@ -169,7 +211,6 @@ const estilos = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  botaoFecharTexto: { color: "#888", fontSize: 14 },
   titulo: { color: "#ffffff", fontSize: 22, fontWeight: "700", marginBottom: 4 },
   divisor: { height: 1, backgroundColor: "#222", marginVertical: 16 },
   rotulo: {
@@ -211,4 +252,14 @@ const estilos = StyleSheet.create({
     borderColor: "#333",
   },
   botaoSairTexto: { color: "#888", fontSize: 16, fontWeight: "600" },
+  botaoExcluir: {
+    backgroundColor: "#FF000015",
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 24,
+    borderWidth: 1,
+    borderColor: "#FF4444",
+  },
+  botaoExcluirTexto: { color: "#FF4444", fontSize: 16, fontWeight: "600" },
 });

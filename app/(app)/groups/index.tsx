@@ -102,6 +102,7 @@ const Groups = () => {
         visivel={modalVisivel}
         isMembro={true}
         onFechar={() => setModalVisivel(false)}
+        onDeletado={carregarGrupos}
       />
     </View>
   );
