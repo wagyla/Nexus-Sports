@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faUsers, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 
@@ -10,11 +11,12 @@ type Props = {
 };
 
 const Navbar = ({ itemAtivo }: Props) => {
+  const insets = useSafeAreaInsets();
   const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
 
   return (
     <>
-      <View style={styles.navbar}>
+      <View style={[styles.navbar, { paddingBottom: insets.bottom + 10 }]}>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => router.push("/(app)/feed")}
@@ -76,8 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderTopWidth: 1,
     borderTopColor: "#333",
-    paddingVertical: 10,
-    paddingBottom: 20,
+    paddingTop: 10,
     position: "absolute",
     bottom: 0,
     left: 0,

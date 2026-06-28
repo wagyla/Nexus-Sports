@@ -6,6 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { router } from "expo-router";
 import style from "./login.styles";
@@ -31,6 +34,15 @@ const Login = () => {
   };
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
     <View style={style.container}>
       <View style={style.boxTop}>
         <Image
@@ -90,6 +102,8 @@ const Login = () => {
         </View>
       </View>
     </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
