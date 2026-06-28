@@ -24,6 +24,18 @@ const Feed = () => {
   const [modalEventoVisivel, setModalEventoVisivel] = useState(false);
   const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
+  const [nomeUsuario, setNomeUsuario] = useState("");
+
+  const carregarUsuario = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("usuarios")
+      .select("nome")
+      .eq("id", user.id)
+      .single();
+    if (data?.nome) setNomeUsuario(data.nome);
+  };
 
   const carregarEventos = async () => {
     setCarregando(true);
@@ -41,11 +53,13 @@ const Feed = () => {
   };
 
   useEffect(() => {
+    carregarUsuario();
     carregarEventos();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
+      carregarUsuario();
       carregarEventos();
     });
 
@@ -76,9 +90,14 @@ const Feed = () => {
   return (
     <View style={styles.container}>
       <FeedHeader
-        saudacao="Olá, Léo!"
+        saudacao={nomeUsuario ? `Olá, ${nomeUsuario.split(" ")[0]}!` : "Olá!"}
         subtitulo="Eventos perto de você!"
-        iniciais="LP"
+        iniciais={nomeUsuario
+          .split(" ")
+          .slice(0, 2)
+          .map((p) => p[0])
+          .join("")
+          .toUpperCase()}
       />
 
       <FeedFiltros
