@@ -14,7 +14,8 @@ import { Calendar } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark, faPen, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import WheelTimePicker from "@/src/components/WheelTimePicker";
-import { formatarDataCompleta, hojeISO, USUARIO_ATUAL } from "./helpers";
+import { formatarDataCompleta, hojeISO } from "./helpers";
+import { useAuth } from "@/src/contexts/AuthContext";
 import type { Evento } from "@/src/types";
 
 type Props = {
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
+  const { user } = useAuth();
   const slideAnim = useRef(new Animated.Value(600)).current;
   const [modoEdicao, setModoEdicao] = useState(false);
   const [calendarioVisivel, setCalendarioVisivel] = useState(false);
@@ -71,7 +73,7 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
 
   if (!evento) return null;
 
-  const isOrganizador = evento.criador.iniciais === USUARIO_ATUAL.iniciais;
+  const isOrganizador = !!user && evento.criadorId === user.id;
   const vagasRestantes = evento.total - evento.participantes.length;
 
   const handleSalvar = () => {

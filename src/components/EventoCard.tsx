@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styles from "@/src/styles/feed.styles";
 import { formatarDataCurta } from "./helpers";
 import type { Evento } from "@/src/types";
@@ -25,6 +26,12 @@ const EventoCard = ({ evento, onPress }: Props) => (
     </View>
 
     <Text style={styles.nomeEvento}>{evento.nome}</Text>
+    {!!evento.grupo && (
+      <View style={styles.grupoRow}>
+        <MaterialCommunityIcons name="account-group" size={12} color="#555" />
+        <Text style={styles.grupoTexto}>{evento.grupo}</Text>
+      </View>
+    )}
     <Text style={styles.endereco}>{evento.endereco}</Text>
 
     <View style={styles.cardRodape}>

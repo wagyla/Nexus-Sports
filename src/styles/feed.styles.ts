@@ -106,6 +106,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 4,
   },
+  grupoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 6,
+  },
+  grupoTexto: {
+    color: "#555555",
+    fontSize: 12,
+  },
   endereco: {
     color: "#888888",
     fontSize: 13,
