@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
-import { supabase } from "@/utils/supabase";
 import Navbar from "@/src/components/Navbar";
 import styles from "@/src/styles/feed.styles";
 
 import { mapEvento, iniciaisDoNome } from "@/src/components/helpers";
-import type { Evento, EventoSupabase } from "@/src/types";
+import type { Evento } from "@/src/types";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { getFeedEventos } from "@/src/api/eventos";
 
 import FeedHeader from "@/src/components/FeedHeader";
 import FeedFiltros from "@/src/components/FeedFiltros";
@@ -27,19 +27,19 @@ const Feed = () => {
   const [modalEventoVisivel, setModalEventoVisivel] = useState(false);
   const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
-
+  
   const carregarEventos = async () => {
+    if (!user) return;
     setCarregando(true);
-    const { data, error } = await supabase
-      .from("eventos")
-      .select("*, grupos(nome), criador:usuarios!criador_id(id, nome)")
-      .order("data_hora", { ascending: true });
+
+    const { data, error } = await getFeedEventos(user.id);
 
     if (error) {
-      console.error("Erro ao carregar eventos:", error.message);
-    } else if (data && data.length > 0) {
-      setEventos((data as EventoSupabase[]).map(mapEvento));
+      console.error("Erro ao carregar eventos:", error);
+    } else {
+      setEventos((data ?? []).map(mapEvento));
     }
+
     setCarregando(false);
   };
 

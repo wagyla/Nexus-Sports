@@ -20,10 +20,9 @@ export type EventoSupabase = {
   cidade: string | null;
   descricao: string | null;
   grupo_id: string | null;
-  criador_id: string;
+  criador_id: string | null;
   vagas: number | null;
   grupos: { nome: string } | null;
-  criador: { id: string; nome: string } | null;
 };
 
 export type GrupoSupabase = {
@@ -80,4 +79,15 @@ export type GrupoForm = {
   esporte: string;
   cidade: string;
   privado: boolean;
+};
+
+export type EventoForm = {
+  nome: string;
+  descricao: string;
+  esporte: string;
+  endereco: string;
+  cidade: string;
+  data: string;
+  hora: string;
+  vagas: string;
 };

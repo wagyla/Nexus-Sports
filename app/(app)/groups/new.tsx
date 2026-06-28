@@ -6,10 +6,10 @@ import {
   Switch,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   FormField,
   ChipSelector,
@@ -17,16 +17,9 @@ import {
   ChipOption,
 } from "@/src/components/Formulario";
 import { router } from "expo-router";
-import { supabase } from "@/utils/supabase";
-import { SupabaseTablesEnum } from "@/utils/Enums";
-
-type GrupoForm = {
-  nome: string;
-  descricao: string;
-  esporte: string;
-  cidade: string;
-  privado: boolean;
-};
+import { useAuth } from "@/src/contexts/AuthContext";
+import { postCreateGrupo } from "@/src/api/grupos";
+import type { GrupoForm } from "@/src/types";
 
 const FORM_INICIAL: GrupoForm = {
   nome: "",
@@ -46,6 +39,7 @@ const ESPORTES: ChipOption[] = [
 ];
 
 const NewGroup = () => {
+  const { user } = useAuth();
   const [grupo, setGrupo] = useState<GrupoForm>(FORM_INICIAL);
 
   const set =
@@ -59,25 +53,14 @@ const NewGroup = () => {
       esporte: prev.esporte === value ? "" : value,
     }));
 
-  const criarGrupo = async () => {
-    try {
-      const { error } = await supabase.from(SupabaseTablesEnum.GRUPOS).insert({
-        nome: grupo.nome,
-        descricao: grupo.descricao || undefined,
-        esporte: grupo.esporte || undefined,
-        cidade: grupo.cidade || undefined,
-        privado: grupo.privado,
-      });
-
-      if (error) {
-        console.error("Erro ao criar grupo:", error.message);
-        return;
-      }
-
-      router.back();
-    } catch (err) {
-      console.error(err);
+  const handleCriarGrupo = async () => {
+    if (!user) return;
+    const { error } = await postCreateGrupo(grupo, user.id);
+    if (error) {
+      console.error("Erro ao criar grupo:", error);
+      return;
     }
+    router.back();
   };
 
   return (
@@ -148,7 +131,7 @@ const NewGroup = () => {
 
           <PrimaryButton
             title="Criar Grupo"
-            onPress={criarGrupo}
+            onPress={handleCriarGrupo}
             style={{ marginTop: 24 }}
           />
         </ScrollView>

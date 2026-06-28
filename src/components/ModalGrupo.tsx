@@ -15,7 +15,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import type { GrupoDisplay } from "@/src/types";
 
 type Props = {
-  grupo: GrupoDisplay | null;
+  grupo: GrupoDisplay | undefined;
   visivel: boolean;
   isMembro: boolean;
   onFechar: () => void;

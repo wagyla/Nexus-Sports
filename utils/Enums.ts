@@ -1,5 +1,6 @@
 export enum SupabaseTablesEnum {
-    GRUPOS = "grupos"
+    GRUPOS = "grupos",
+    EVENTOS = "eventos",
 }
 
 export enum SessionStorageKeysEnum {

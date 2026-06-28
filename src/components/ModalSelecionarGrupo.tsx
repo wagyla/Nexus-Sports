@@ -12,8 +12,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
-import { supabase } from "@/utils/supabase";
-import { useAuth } from "@/src/contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faXmark,
@@ -22,9 +20,10 @@ import {
   faChevronRight,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
-import { corDoEsporte, iconeDoEsporte } from "./helpers";
+import { corDoEsporte, iconeDoEsporte, emojiDoEsporte } from "./helpers";
 import type { Grupo } from "@/src/types";
-import { SupabaseTablesEnum } from "@/utils/Enums";
+import { getMeusGrupos } from "@/src/api/grupos";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 type Props = {
   visivel: boolean;
@@ -60,14 +59,9 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const carregarGrupos = async () => {
     if (!user) return;
     setCarregando(true);
-
-    const { data, error } = await supabase
-      .from(SupabaseTablesEnum.GRUPOS)
-      .select("*")
-      .eq("criador_id", user.id);
-    if (!error && data) {
-      setGrupos(data as Grupo[]);
-    }
+    const { data, error } = await getMeusGrupos(user.id);
+    if (error) console.error("Erro ao carregar grupos:", error);
+    else setGrupos((data ?? []) as Grupo[]);
     setCarregando(false);
   };
 
@@ -114,7 +108,12 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
             </Text>
 
             <View style={estilos.buscaContainer}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#555" style={estilos.buscaIcone} />
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                size={15}
+                color="#555"
+                style={estilos.buscaIcone}
+              />
               <TextInput
                 style={estilos.buscaInput}
                 placeholder="Buscar grupo..."
@@ -123,7 +122,10 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                 onChangeText={setBusca}
               />
               {busca.length > 0 && (
-                <TouchableOpacity onPress={() => setBusca("")} style={{ paddingHorizontal: 8 }}>
+                <TouchableOpacity
+                  onPress={() => setBusca("")}
+                  style={{ paddingHorizontal: 8 }}
+                >
                   <FontAwesomeIcon icon={faXmark} size={14} color="#555" />
                 </TouchableOpacity>
               )}
@@ -185,7 +187,11 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                           </View>
                         )}
                       </View>
-                      <FontAwesomeIcon icon={faChevronRight} size={14} color="#444" />
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={14}
+                        color="#444"
+                      />
                     </TouchableOpacity>
                   );
                 })

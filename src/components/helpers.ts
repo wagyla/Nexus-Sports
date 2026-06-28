@@ -85,7 +85,6 @@ export const formatarDataCompleta = (dataISO: string): string => {
 export const mapEvento = (e: EventoSupabase): Evento => {
   const dataISO = e.data_hora?.split("T")[0] ?? "";
   const hora = e.data_hora?.split("T")[1]?.slice(0, 5) ?? "00:00";
-  const criadorNome = e.criador?.nome ?? "Organizador";
 
   return {
     id: String(e.id),
@@ -101,8 +100,8 @@ export const mapEvento = (e: EventoSupabase): Evento => {
     total: e.vagas ?? 0,
     grupo: e.grupos?.nome ?? "",
     criador: {
-      iniciais: iniciaisDoNome(criadorNome),
-      nome: criadorNome,
+      iniciais: "",
+      nome: "",
       corAvatar: "#6c63ff",
     },
     descricao: e.descricao ?? "",
