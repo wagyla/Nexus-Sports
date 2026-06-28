@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { ChipSelector, ChipOption } from "@/src/components/Formulario";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { supabase } from "@/utils/supabase";
 
 const ESPORTES: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -27,15 +29,20 @@ const ESPORTES: ChipOption[] = [
 ];
 
 const EditProfile = () => {
-  const [nome, setNome] = useState("Leonardo Pinheiro");
-  const [cidade, setCidade] = useState("Almenara-MG");
-  const [email, setEmail] = useState("leonardo@email.com");
-  const [esportes, setEsportes] = useState<string[]>([
-    "corrida",
-    "capoeira",
-    "volei",
-    "natacao",
-  ]);
+  const { user } = useAuth();
+  const [nome, setNome] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [email, setEmail] = useState("");
+  const [esportes, setEsportes] = useState<string[]>([]);
+  const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setNome(user.user_metadata?.nome ?? "");
+    setCidade(user.user_metadata?.cidade ?? "");
+    setEmail(user.email ?? "");
+    setEsportes(user.user_metadata?.esportes ?? []);
+  }, [user]);
 
   const toggleEsporte = (value: string) =>
     setEsportes((prev) =>
@@ -49,7 +56,7 @@ const EditProfile = () => {
     .map((p) => p[0].toUpperCase())
     .join("");
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!nome.trim()) {
       Alert.alert("Campo obrigatório", "Informe seu nome.");
       return;
@@ -58,11 +65,17 @@ const EditProfile = () => {
       Alert.alert("E-mail inválido", "O e-mail informado não contém '@'.");
       return;
     }
-    Alert.alert(
-      "Perfil atualizado!",
-      "Suas informações foram salvas com sucesso.",
-      [{ text: "OK", onPress: () => router.push("/(app)/profile") }],
-    );
+    setSalvando(true);
+    const { error } = await supabase.auth.updateUser({
+      email,
+      data: { nome, cidade, esportes },
+    });
+    setSalvando(false);
+    if (error) {
+      Alert.alert("Erro", error.message);
+      return;
+    }
+    router.push("/(app)/profile");
   };
 
   return (
@@ -142,8 +155,10 @@ const EditProfile = () => {
             onToggle={toggleEsporte}
           />
 
-          <TouchableOpacity style={estilos.botaoSalvar} onPress={handleSalvar}>
-            <Text style={estilos.botaoSalvarTexto}>Salvar alterações</Text>
+          <TouchableOpacity style={estilos.botaoSalvar} onPress={handleSalvar} disabled={salvando}>
+            <Text style={estilos.botaoSalvarTexto}>
+              {salvando ? "Salvando..." : "Salvar alterações"}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity

@@ -31,8 +31,20 @@ type GrupoPerfil = {
   membros: number;
 };
 
-const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-
+const MESES = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
 
 const Profile = () => {
   const { user } = useAuth();
@@ -40,7 +52,6 @@ const Profile = () => {
   const [grupos, setGrupos] = useState<GrupoPerfil[]>([]);
   const [modalEventosVisivel, setModalEventosVisivel] = useState(false);
   const [modalGruposVisivel, setModalGruposVisivel] = useState(false);
-
 
   const nome: string = user?.user_metadata?.nome ?? "";
   const cidade: string = user?.user_metadata?.cidade ?? "";
@@ -75,7 +86,7 @@ const Profile = () => {
               distancia: "",
               status: passado ? "Concluído" : "Agendado",
             };
-          })
+          }),
         );
       }
     };
@@ -92,7 +103,7 @@ const Profile = () => {
             nome: g.nome ?? "",
             esporte: g.esporte ?? "outro",
             membros: 0,
-          }))
+          })),
         );
       }
     };
@@ -107,7 +118,7 @@ const Profile = () => {
       <View style={styles.cabecalho}>
         <TouchableOpacity
           style={styles.botaoVoltar}
-          onPress={() => router.back()}
+          onPress={() => router.push("/(app)/feed")}
         >
           <Text style={styles.botaoVoltarTexto}>‹</Text>
           <Text style={styles.titulo}>Perfil</Text>
