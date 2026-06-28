@@ -14,7 +14,7 @@ import GrupoCard from "@/src/components/GrupoCard";
 import ModalGrupo from "@/src/components/ModalGrupo";
 import type { GrupoSupabase, GrupoDisplay } from "@/src/types";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { getMeusGrupos } from "@/src/api/grupos";
+import { getMeusGrupos, getGruposPublicos } from "@/src/api/grupos";
 
 const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
   id: g.id,
@@ -32,18 +32,29 @@ const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
 const Groups = () => {
   const { user } = useAuth();
   const [meusGrupos, setMeusGrupos] = useState<GrupoDisplay[]>([]);
+  const [gruposPublicos, setGruposPublicos] = useState<GrupoDisplay[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [grupoSelecionado, setGrupoSelecionado] = useState<GrupoDisplay | undefined>(undefined);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [isMembro, setIsMembro] = useState(false);
 
   const carregarGrupos = async () => {
     if (!user) return;
     setCarregando(true);
 
-    const { data, error } = await getMeusGrupos(user.id);
+    const [
+      { data: meus, error: erroMeus },
+      { data: publicos, error: erroPublicos },
+    ] = await Promise.all([
+      getMeusGrupos(user.id),
+      getGruposPublicos(),
+    ]);
 
-    if (error) console.error("Erro ao carregar grupos:", error);
-    else setMeusGrupos((data ?? []).map((g: GrupoSupabase) => mapGrupo(g, true)));
+    if (erroMeus) console.error("Erro nos meus grupos:", erroMeus);
+    if (erroPublicos) console.error("Erro nos grupos públicos:", erroPublicos);
+
+    setMeusGrupos((meus ?? []).map((g: GrupoSupabase) => mapGrupo(g, true)));
+    setGruposPublicos((publicos ?? []).map((g: GrupoSupabase) => mapGrupo(g, false)));
 
     setCarregando(false);
   };
@@ -52,8 +63,9 @@ const Groups = () => {
     carregarGrupos();
   }, []);
 
-  const abrirModal = (grupo: GrupoDisplay) => {
+  const abrirModal = (grupo: GrupoDisplay, membro: boolean) => {
     setGrupoSelecionado(grupo);
+    setIsMembro(membro);
     setModalVisivel(true);
   };
 
@@ -78,16 +90,29 @@ const Groups = () => {
         {carregando ? (
           <ActivityIndicator color="#00FFD1" style={{ marginTop: 24 }} />
         ) : meusGrupos.length === 0 ? (
-          <Text style={estilos.textoVazio}>
-            Você ainda não criou nenhum grupo.
-          </Text>
+          <Text style={estilos.textoVazio}>Você ainda não criou nenhum grupo.</Text>
         ) : (
           meusGrupos.map((grupo) => (
             <GrupoCard
               key={grupo.id}
               grupo={grupo}
               tipo="meu"
-              onPress={() => abrirModal(grupo)}
+              onPress={() => abrirModal(grupo, true)}
+            />
+          ))
+        )}
+
+        <Text style={estilos.secaoTitulo}>Descobrir Grupos</Text>
+
+        {!carregando && gruposPublicos.length === 0 ? (
+          <Text style={estilos.textoVazio}>Nenhum grupo público disponível.</Text>
+        ) : (
+          gruposPublicos.map((grupo) => (
+            <GrupoCard
+              key={grupo.id}
+              grupo={grupo}
+              tipo="publico"
+              onPress={() => abrirModal(grupo, false)}
             />
           ))
         )}
@@ -100,7 +125,7 @@ const Groups = () => {
       <ModalGrupo
         grupo={grupoSelecionado}
         visivel={modalVisivel}
-        isMembro={true}
+        isMembro={isMembro}
         onFechar={() => setModalVisivel(false)}
         onDeletado={carregarGrupos}
       />
