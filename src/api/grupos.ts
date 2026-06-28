@@ -47,3 +47,13 @@ export const postCreateGrupo = async (form: GrupoForm, userId: string): ApiResul
   if (error) return { data: undefined, error: error.message };
   return { data: null, error: undefined };
 };
+
+export const countMeusGrupos = async (userId: string): ApiResult<number> => {
+  const { count, error } = await supabase
+    .from(TABELA)
+    .select("id", { count: "exact", head: true })
+    .eq("criado_por", userId);
+
+  if (error) return { data: undefined, error: error.message };
+  return { data: count ?? 0, error: undefined };
+};

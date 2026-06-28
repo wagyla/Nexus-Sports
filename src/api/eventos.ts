@@ -48,3 +48,29 @@ export const postCreateEvento = async (
   if (error) return { data: undefined, error: error.message };
   return { data: null, error: undefined };
 };
+
+export const getMeusEventosPaginados = async (
+  userId: string,
+  pagina: number,
+  porPagina = 10,
+): ApiResult<EventoSupabase[]> => {
+  const { data, error } = await supabase
+    .from(TABELA)
+    .select("*")
+    .eq("criado_por", userId)
+    .order("data_hora", { ascending: false })
+    .range(pagina * porPagina, (pagina + 1) * porPagina - 1);
+
+  if (error) return { data: undefined, error: error.message };
+  return { data: (data ?? []) as EventoSupabase[], error: undefined };
+};
+
+export const countMeusEventos = async (userId: string): ApiResult<number> => {
+  const { count, error } = await supabase
+    .from(TABELA)
+    .select("id", { count: "exact", head: true })
+    .eq("criado_por", userId);
+
+  if (error) return { data: undefined, error: error.message };
+  return { data: count ?? 0, error: undefined };
+};

@@ -3,57 +3,51 @@ import {
   View,
   Text,
   StatusBar,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { router } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import Navbar from "@/src/components/Navbar";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
+import Navbar from "@/src/components/Navbar";
 import ModalEventosPerfil from "@/src/components/ModalEventosPerfil";
 import ModalGruposPerfil from "@/src/components/ModalGruposPerfil";
-import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
-
 import { useAuth } from "@/src/contexts/AuthContext";
-import { supabase } from "@/utils/supabase";
 import { corDoEsporte, iniciaisDoNome } from "@/src/components/helpers";
+import { getMeusEventosPaginados, countMeusEventos } from "@/src/api/eventos";
+import { getMeusGrupos, countMeusGrupos } from "@/src/api/grupos";
+import type { EventoSupabase } from "@/src/types";
 
-type AtividadeEvento = {
-  titulo: string;
-  data: string;
-  distancia: string;
-  status: string;
+const POR_PAGINA = 10;
+
+const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+const ICONE_MDI: Record<string, string> = {
+  corrida: "run",
+  ciclismo: "bike",
+  tenis: "tennis",
+  volei: "volleyball",
+  futebol: "soccer",
+  natacao: "swim",
+  outro: "trophy-variant",
 };
 
-type GrupoPerfil = {
-  nome: string;
-  esporte: string;
-  membros: number;
+const iconeMDI = (esporte: string): string =>
+  ICONE_MDI[esporte?.toLowerCase()] ?? "trophy-variant";
+
+const formatarData = (dataHora: string): string => {
+  const iso = (dataHora ?? "").split("T")[0];
+  const [, mes, dia] = iso.split("-");
+  return dia && mes ? `${dia} ${MESES[Number(mes) - 1]}` : "";
 };
 
-const MESES = [
-  "Jan",
-  "Fev",
-  "Mar",
-  "Abr",
-  "Mai",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Set",
-  "Out",
-  "Nov",
-  "Dez",
-];
+const isPassado = (dataHora: string): boolean => new Date(dataHora) < new Date();
 
 const Profile = () => {
   const { user } = useAuth();
-  const [eventos, setEventos] = useState<AtividadeEvento[]>([]);
-  const [grupos, setGrupos] = useState<GrupoPerfil[]>([]);
-  const [modalEventosVisivel, setModalEventosVisivel] = useState(false);
-  const [modalGruposVisivel, setModalGruposVisivel] = useState(false);
-  const [modalSelecionarGrupoVisivel, setModalSelecionarGrupoVisivel] = useState(false);
 
   const nome: string = user?.user_metadata?.nome ?? "";
   const cidade: string = user?.user_metadata?.cidade ?? "";
@@ -64,60 +58,157 @@ const Profile = () => {
     cor: corDoEsporte(e),
   }));
 
+  const [totalEventos, setTotalEventos] = useState(0);
+  const [totalGrupos, setTotalGrupos] = useState(0);
+  const [eventos, setEventos] = useState<EventoSupabase[]>([]);
+  const [grupos, setGrupos] = useState<{ nome: string; esporte: string; membros: number }[]>([]);
+  const [pagina, setPagina] = useState(0);
+  const [carregando, setCarregando] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  const [temMais, setTemMais] = useState(true);
+  const [modalEventosVisivel, setModalEventosVisivel] = useState(false);
+  const [modalGruposVisivel, setModalGruposVisivel] = useState(false);
+
   useEffect(() => {
     if (!user) return;
+    void carregarDados();
+  }, [user?.id]);
 
-    const carregarEventos = async () => {
-      const { data } = await supabase
-        .from("eventos")
-        .select("nome, data_hora")
-        .eq("criador_id", user.id)
-        .order("data_hora", { ascending: false });
+  const carregarDados = async () => {
+    setCarregando(true);
+    const [resContEventos, resContGrupos, resEventos, resGrupos] = await Promise.all([
+      countMeusEventos(user!.id),
+      countMeusGrupos(user!.id),
+      getMeusEventosPaginados(user!.id, 0, POR_PAGINA),
+      getMeusGrupos(user!.id),
+    ]);
 
-      if (data) {
-        setEventos(
-          data.map((e) => {
-            const iso = (e.data_hora ?? "").split("T")[0];
-            const [, mes, dia] = iso.split("-");
-            const dataFormatada =
-              dia && mes ? `${dia} ${MESES[Number(mes) - 1]}` : "";
-            const passado = new Date(e.data_hora) < new Date();
-            return {
-              titulo: e.nome ?? "",
-              data: dataFormatada,
-              distancia: "",
-              status: passado ? "Concluído" : "Agendado",
-            };
-          }),
-        );
-      }
-    };
+    if (!resContEventos.error) setTotalEventos(resContEventos.data ?? 0);
+    if (!resContGrupos.error) setTotalGrupos(resContGrupos.data ?? 0);
 
-    const carregarGrupos = async () => {
-      const { data } = await supabase
-        .from("grupos")
-        .select("nome, esporte")
-        .eq("criador_id", user.id);
+    if (!resEventos.error) {
+      const lista = resEventos.data ?? [];
+      setEventos(lista);
+      setTemMais(lista.length === POR_PAGINA);
+      setPagina(0);
+    }
 
-      if (data) {
-        setGrupos(
-          data.map((g) => ({
-            nome: g.nome ?? "",
-            esporte: g.esporte ?? "outro",
-            membros: 0,
-          })),
-        );
-      }
-    };
+    if (!resGrupos.error) {
+      setGrupos(
+        (resGrupos.data ?? []).map((g) => ({
+          nome: g.nome ?? "",
+          esporte: g.esporte ?? "outro",
+          membros: 0,
+        }))
+      );
+    }
 
-    carregarEventos();
-    carregarGrupos();
-  }, [user]);
+    setCarregando(false);
+  };
+
+  const carregarMais = async () => {
+    if (carregandoMais || !temMais || !user) return;
+    setCarregandoMais(true);
+    const novaPagina = pagina + 1;
+    const res = await getMeusEventosPaginados(user.id, novaPagina, POR_PAGINA);
+    if (!res.error) {
+      const novos = res.data ?? [];
+      setEventos((prev) => [...prev, ...novos]);
+      setTemMais(novos.length === POR_PAGINA);
+      setPagina(novaPagina);
+    }
+    setCarregandoMais(false);
+  };
+
+  const eventoParaAtividade = (e: EventoSupabase) => ({
+    titulo: e.nome ?? "",
+    data: formatarData(e.data_hora),
+    distancia: "",
+    status: isPassado(e.data_hora) ? "Concluído" : "Agendado",
+  });
+
+  const renderEvento = ({ item }: { item: EventoSupabase }) => {
+    const passado = isPassado(item.data_hora);
+    const cor = corDoEsporte(item.esporte);
+    return (
+      <View style={styles.card}>
+        <View style={[styles.cardIcone, { backgroundColor: cor + "22" }]}>
+          <MaterialCommunityIcons
+            name={iconeMDI(item.esporte) as any}
+            size={22}
+            color={cor}
+          />
+        </View>
+        <View style={styles.cardInfo}>
+          <Text style={styles.cardTitulo}>{item.nome}</Text>
+          <Text style={styles.cardDetalhe}>{formatarData(item.data_hora)}</Text>
+        </View>
+        <View style={[styles.tag, passado ? styles.tagConcluido : styles.tagAgendado]}>
+          <Text style={[styles.tagTexto, passado ? styles.tagTextoConcluido : styles.tagTextoAgendado]}>
+            {passado ? "Concluído" : "Agendado"}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const cabecalho = (
+    <>
+      <View style={styles.avatarContainer}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarTexto}>{iniciais}</Text>
+        </View>
+        <Text style={styles.nome}>{nome}</Text>
+        {!!cidade && <Text style={styles.cidade}>{cidade}</Text>}
+      </View>
+
+      <View style={styles.estatistica}>
+        <TouchableOpacity
+          style={styles.cartaoEstat}
+          onPress={() => setModalEventosVisivel(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.estatNumero}>{totalEventos}</Text>
+          <Text style={styles.estatRotulo}>Eventos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cartaoEstat}
+          onPress={() => setModalGruposVisivel(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.estatNumero, { color: "#FF8800" }]}>{totalGrupos}</Text>
+          <Text style={styles.estatRotulo}>Grupos</Text>
+        </TouchableOpacity>
+      </View>
+
+      {esportesFavoritos.length > 0 && (
+        <>
+          <Text style={styles.secaoTitulo}>Esportes Favoritos</Text>
+          <View style={styles.esportes}>
+            {esportesFavoritos.map((esporte, index) => (
+              <View
+                key={index}
+                style={[styles.esporteTag, { backgroundColor: esporte.cor + "33" }]}
+              >
+                <Text style={[styles.esporteTexto, { color: esporte.cor }]}>
+                  {esporte.nome}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </>
+      )}
+
+      {totalEventos > 0 && (
+        <Text style={styles.secaoTitulo}>Atividades Recentes</Text>
+      )}
+    </>
+  );
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D0D0D" />
-      <View style={styles.cabecalho}>
+      <View style={styles.cabecalhoTela}>
         <TouchableOpacity
           style={styles.botaoVoltar}
           onPress={() => router.push("/(app)/feed")}
@@ -134,111 +225,45 @@ const Profile = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={eventos}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        renderItem={renderEvento}
+        ListHeaderComponent={cabecalho}
+        ListFooterComponent={
+          carregandoMais ? (
+            <ActivityIndicator color="#00FFD1" style={{ marginVertical: 16 }} />
+          ) : null
+        }
+        ListEmptyComponent={
+          !carregando ? (
+            <View style={styles.vazioContainer}>
+              <MaterialCommunityIcons
+                name="calendar-blank-outline"
+                size={48}
+                color="#333"
+              />
+              <Text style={styles.vazioTexto}>Você não participou de nenhum evento recentemente</Text>
+            </View>
+          ) : null
+        }
+        onEndReached={carregarMais}
+        onEndReachedThreshold={0.4}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarTexto}>{iniciais}</Text>
-          </View>
-          <Text style={styles.nome}>{nome}</Text>
-          {!!cidade && <Text style={styles.cidade}>{cidade}</Text>}
-        </View>
-
-        <View style={styles.estatistica}>
-          <TouchableOpacity
-            style={styles.cartaoEstat}
-            onPress={() => setModalEventosVisivel(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.estatNumero}>{eventos.length}</Text>
-            <Text style={styles.estatRotulo}>Eventos</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cartaoEstat}
-            onPress={() => setModalGruposVisivel(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.estatNumero, { color: "#FF8800" }]}>
-              {grupos.length}
-            </Text>
-            <Text style={styles.estatRotulo}>Grupos</Text>
-          </TouchableOpacity>
-        </View>
-
-        {esportesFavoritos.length > 0 && (
-          <>
-            <Text style={styles.secaoTitulo}>Esportes Favoritos</Text>
-            <View style={styles.esportes}>
-              {esportesFavoritos.map((esporte, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.esporteTag,
-                    { backgroundColor: esporte.cor + "33" },
-                  ]}
-                >
-                  <Text style={[styles.esporteTexto, { color: esporte.cor }]}>
-                    {esporte.nome}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
-
-        {eventos.length > 0 && (
-          <>
-            <Text style={styles.secaoTitulo}>Atividades Recentes</Text>
-            {eventos.slice(0, 4).map((evento, index) => (
-              <View key={index} style={styles.card}>
-                <View>
-                  <Text style={styles.cardTitulo}>{evento.titulo}</Text>
-                  <Text style={styles.cardDetalhe}>
-                    {evento.data}
-                    {evento.distancia ? ` · ${evento.distancia}` : ""}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.tag,
-                    evento.status === "Agendado" && styles.tagAgendado,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.tagTexto,
-                      evento.status === "Agendado" && styles.tagTextoAgendado,
-                    ]}
-                  >
-                    {evento.status}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </>
-        )}
-      </ScrollView>
-
-      <Navbar
-        itemAtivo="perfil"
-        onNovoEvento={() => setModalSelecionarGrupoVisivel(true)}
       />
+
+      <Navbar itemAtivo="perfil" />
 
       <ModalEventosPerfil
         visivel={modalEventosVisivel}
         onFechar={() => setModalEventosVisivel(false)}
-        eventos={eventos}
+        eventos={eventos.map(eventoParaAtividade)}
       />
       <ModalGruposPerfil
         visivel={modalGruposVisivel}
         onFechar={() => setModalGruposVisivel(false)}
         grupos={grupos}
-      />
-      <ModalSelecionarGrupo
-        visivel={modalSelecionarGrupoVisivel}
-        onFechar={() => setModalSelecionarGrupoVisivel(false)}
       />
     </View>
   );
@@ -253,7 +278,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 10,
   },
-  cabecalho: {
+  cabecalhoTela: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -362,37 +387,63 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#1A1A1A",
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#222",
+  },
+  cardIcone: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  cardInfo: {
+    flex: 1,
+    gap: 4,
   },
   cardTitulo: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "600",
   },
   cardDetalhe: {
     color: "#888888",
     fontSize: 13,
-    marginTop: 4,
   },
   tag: {
-    backgroundColor: "#00FFD133",
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
   },
   tagTexto: {
-    color: "#00FFD1",
     fontSize: 12,
     fontWeight: "bold",
+  },
+  tagConcluido: {
+    backgroundColor: "#00FFD133",
+  },
+  tagTextoConcluido: {
+    color: "#00FFD1",
   },
   tagAgendado: {
     backgroundColor: "#FF880033",
   },
   tagTextoAgendado: {
     color: "#FF8800",
+  },
+  vazioContainer: {
+    alignItems: "center",
+    paddingVertical: 40,
+    gap: 12,
+  },
+  vazioTexto: {
+    color: "#555",
+    fontSize: 14,
+    textAlign: "center",
   },
 });
