@@ -64,14 +64,14 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const handleSelecionarGrupo = (grupo: Grupo) => {
     onFechar();
     router.push({
-      pathname: "/(app)/criar-evento",
+      pathname: "/(app)/events/new",
       params: { grupoId: grupo.id, grupoNome: grupo.nome },
     });
   };
 
   const handleCriarGrupo = () => {
     onFechar();
-    router.push("/(app)/criar-grupo");
+    router.push("/(app)/groups/new");
   };
 
   return (

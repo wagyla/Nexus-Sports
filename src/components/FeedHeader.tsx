@@ -15,7 +15,7 @@ const FeedHeader = ({ saudacao, subtitulo, iniciais }: Props) => (
       <Text style={styles.saudacao}>{saudacao}</Text>
       <Text style={styles.subtitulo}>{subtitulo}</Text>
     </View>
-    <TouchableOpacity style={styles.avatar} onPress={() => router.push("/(app)/perfil")}>
+    <TouchableOpacity style={styles.avatar} onPress={() => router.push("/(app)/profile")}>
       <Text style={styles.avatarTexto}>{iniciais}</Text>
     </TouchableOpacity>
   </View>
