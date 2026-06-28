@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { corDoEsporte, emojiDoEsporte } from "./helpers";
 import type { Grupo } from "./types";
+import { SupabaseTablesEnum } from "@/utils/Enums";
 
 type Props = {
   visivel: boolean;
@@ -48,10 +49,8 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
 
   const carregarGrupos = async () => {
     setCarregando(true);
-    const { data, error } = await supabase
-      .from("grupos")
-      .select("id, nome, esporte, emoji")
-      .order("nome");
+
+    const { data, error } = await supabase.from(SupabaseTablesEnum.GRUPOS).select("*");
     if (!error && data) {
       setGrupos(data as Grupo[]);
     }
@@ -59,7 +58,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   };
 
   const gruposFiltrados = grupos.filter((g) =>
-    g.nome.toLowerCase().includes(busca.toLowerCase())
+    g.nome.toLowerCase().includes(busca.toLowerCase()),
   );
 
   const handleSelecionarGrupo = (grupo: Grupo) => {
@@ -111,7 +110,15 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
               />
               {busca.length > 0 && (
                 <TouchableOpacity onPress={() => setBusca("")}>
-                  <Text style={{ color: "#555", fontSize: 16, paddingHorizontal: 8 }}>✕</Text>
+                  <Text
+                    style={{
+                      color: "#555",
+                      fontSize: 16,
+                      paddingHorizontal: 8,
+                    }}
+                  >
+                    ✕
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -139,7 +146,8 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
               ) : (
                 gruposFiltrados.map((grupo) => {
                   const cor = corDoEsporte(grupo.esporte ?? "outro");
-                  const emoji = grupo.emoji ?? emojiDoEsporte(grupo.esporte ?? "outro");
+                  const emoji =
+                    grupo.emoji ?? emojiDoEsporte(grupo.esporte ?? "outro");
                   return (
                     <TouchableOpacity
                       key={grupo.id}
@@ -147,14 +155,26 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                       onPress={() => handleSelecionarGrupo(grupo)}
                       activeOpacity={0.7}
                     >
-                      <View style={[estilos.grupoIcone, { backgroundColor: cor + "22" }]}>
+                      <View
+                        style={[
+                          estilos.grupoIcone,
+                          { backgroundColor: cor + "22" },
+                        ]}
+                      >
                         <Text style={estilos.grupoIconeEmoji}>{emoji}</Text>
                       </View>
                       <View style={estilos.grupoInfo}>
                         <Text style={estilos.grupoNome}>{grupo.nome}</Text>
                         {grupo.esporte && (
-                          <View style={[estilos.grupoBadge, { backgroundColor: cor + "22" }]}>
-                            <Text style={[estilos.grupoBadgeTexto, { color: cor }]}>
+                          <View
+                            style={[
+                              estilos.grupoBadge,
+                              { backgroundColor: cor + "22" },
+                            ]}
+                          >
+                            <Text
+                              style={[estilos.grupoBadgeTexto, { color: cor }]}
+                            >
                               {grupo.esporte}
                             </Text>
                           </View>
