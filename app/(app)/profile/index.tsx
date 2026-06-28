@@ -47,7 +47,12 @@ const formatarData = (dataHora: string): string => {
 const isPassado = (dataHora: string): boolean => new Date(dataHora) < new Date();
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const handleSair = async () => {
+    await signOut();
+    router.replace("/(auth)/login");
+  };
 
   const nome: string = user?.user_metadata?.nome ?? "";
   const cidade: string = user?.user_metadata?.cidade ?? "";
@@ -160,6 +165,10 @@ const Profile = () => {
         </View>
         <Text style={styles.nome}>{nome}</Text>
         {!!cidade && <Text style={styles.cidade}>{cidade}</Text>}
+        <TouchableOpacity style={styles.botaoSair} onPress={handleSair} activeOpacity={0.7}>
+          <MaterialCommunityIcons name="logout" size={12} color="#555" />
+          <Text style={styles.botaoSairTexto}>Sair da conta</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.estatistica}>
@@ -445,5 +454,19 @@ const styles = StyleSheet.create({
     color: "#555",
     fontSize: 14,
     textAlign: "center",
+  },
+  botaoSair: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    backgroundColor: "#1A1A1A",
+  },
+  botaoSairTexto: {
+    color: "#555",
+    fontSize: 12,
   },
 });
