@@ -10,6 +10,8 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import type { GrupoDisplay } from "@/src/types";
 
 type Props = {
@@ -67,7 +69,7 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar }: Props) => {
 
             <View style={estilos.cabecalho}>
               <TouchableOpacity onPress={onFechar} style={estilos.botaoFechar}>
-                <Text style={estilos.botaoFecharTexto}>✕</Text>
+                <FontAwesomeIcon icon={faXmark} size={14} color="#888" />
               </TouchableOpacity>
             </View>
 
@@ -167,7 +169,7 @@ const estilos = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  botaoFecharTexto: { color: "#888", fontSize: 14, fontWeight: "600" },
+  botaoFecharTexto: { color: "#888", fontSize: 14 },
   titulo: { color: "#ffffff", fontSize: 22, fontWeight: "700", marginBottom: 4 },
   divisor: { height: 1, backgroundColor: "#222", marginVertical: 16 },
   rotulo: {

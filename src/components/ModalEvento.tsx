@@ -11,6 +11,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faXmark, faPen, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import WheelTimePicker from "@/src/components/WheelTimePicker";
 import { formatarDataCompleta, hojeISO, USUARIO_ATUAL } from "./helpers";
 import type { Evento } from "@/src/types";
@@ -118,14 +120,14 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                     onPress={() => setModoEdicao(true)}
                     style={[estilos.botaoFechar, { backgroundColor: "#1a1a2e", marginRight: 8 }]}
                   >
-                    <Text style={{ color: "#00FFD1", fontSize: 14 }}>✎</Text>
+                    <FontAwesomeIcon icon={faPen} size={13} color="#00FFD1" />
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
                   onPress={modoEdicao ? handleCancelar : onFechar}
                   style={estilos.botaoFechar}
                 >
-                  <Text style={estilos.botaoFecharTexto}>✕</Text>
+                  <FontAwesomeIcon icon={faXmark} size={14} color="#888" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -163,7 +165,7 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                         ? (() => { const [a, m, d] = form.dataISO.split("-"); return `${d}/${m}/${a}`; })()
                         : "DD/MM/AAAA"}
                     </Text>
-                    <Text style={{ color: "#00FFD1", fontSize: 16 }}>📅</Text>
+                    <FontAwesomeIcon icon={faCalendarDays} size={16} color="#00FFD1" />
                   </TouchableOpacity>
 
                   <Text style={[estilos.rotulo, { marginBottom: 0 }]}>HORÁRIO</Text>

@@ -13,9 +13,17 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faXmark,
+  faMagnifyingGlass,
+  faMedal,
+  faChevronRight,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import type { Grupo } from "@/src/types";
 import { SupabaseTablesEnum } from "@/utils/Enums";
-import { corDoEsporte, emojiDoEsporte } from "@/src/components/helpers";
+import { corDoEsporte, iconeDoEsporte } from "@/src/components/helpers";
 
 type Props = {
   visivel: boolean;
@@ -93,7 +101,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
             <View style={estilos.cabecalho}>
               <Text style={estilos.titulo}>Novo Evento</Text>
               <TouchableOpacity onPress={onFechar} style={estilos.botaoFechar}>
-                <Text style={estilos.botaoFecharTexto}>✕</Text>
+                <FontAwesomeIcon icon={faXmark} size={14} color="#888" />
               </TouchableOpacity>
             </View>
 
@@ -102,7 +110,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
             </Text>
 
             <View style={estilos.buscaContainer}>
-              <Text style={estilos.buscaIcone}>🔍</Text>
+              <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#555" style={estilos.buscaIcone} />
               <TextInput
                 style={estilos.buscaInput}
                 placeholder="Buscar grupo..."
@@ -111,16 +119,8 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                 onChangeText={setBusca}
               />
               {busca.length > 0 && (
-                <TouchableOpacity onPress={() => setBusca("")}>
-                  <Text
-                    style={{
-                      color: "#555",
-                      fontSize: 16,
-                      paddingHorizontal: 8,
-                    }}
-                  >
-                    ✕
-                  </Text>
+                <TouchableOpacity onPress={() => setBusca("")} style={{ paddingHorizontal: 8 }}>
+                  <FontAwesomeIcon icon={faXmark} size={14} color="#555" />
                 </TouchableOpacity>
               )}
             </View>
@@ -138,7 +138,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                 />
               ) : gruposFiltrados.length === 0 ? (
                 <View style={estilos.vazioContainer}>
-                  <Text style={estilos.vazioEmoji}>🏅</Text>
+                  <FontAwesomeIcon icon={faMedal} size={36} color="#333" />
                   <Text style={estilos.vazioTexto}>
                     {busca
                       ? `Nenhum grupo encontrado\npara "${busca}"`
@@ -148,8 +148,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
               ) : (
                 gruposFiltrados.map((grupo) => {
                   const cor = corDoEsporte(grupo.esporte ?? "outro");
-                  const emoji =
-                    grupo.emoji ?? emojiDoEsporte(grupo.esporte ?? "outro");
+                  const icone = iconeDoEsporte(grupo.esporte ?? "outro");
                   return (
                     <TouchableOpacity
                       key={grupo.id}
@@ -163,7 +162,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                           { backgroundColor: cor + "22" },
                         ]}
                       >
-                        <Text style={estilos.grupoIconeEmoji}>{emoji}</Text>
+                        <FontAwesomeIcon icon={icone} size={20} color={cor} />
                       </View>
                       <View style={estilos.grupoInfo}>
                         <Text style={estilos.grupoNome}>{grupo.nome}</Text>
@@ -182,7 +181,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                           </View>
                         )}
                       </View>
-                      <Text style={estilos.seta}>›</Text>
+                      <FontAwesomeIcon icon={faChevronRight} size={14} color="#444" />
                     </TouchableOpacity>
                   );
                 })
@@ -198,7 +197,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
               activeOpacity={0.8}
             >
               <View style={estilos.botaoCriarIconeContainer}>
-                <Text style={estilos.botaoCriarIcone}>+</Text>
+                <FontAwesomeIcon icon={faPlus} size={18} color="#00FFD1" />
               </View>
               <Text style={estilos.botaoCriarTexto}>Criar novo grupo</Text>
             </TouchableOpacity>
@@ -273,7 +272,6 @@ const estilos = StyleSheet.create({
     marginBottom: 16,
   },
   buscaIcone: {
-    fontSize: 16,
     marginRight: 8,
   },
   buscaInput: {
@@ -289,9 +287,6 @@ const estilos = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 32,
     gap: 12,
-  },
-  vazioEmoji: {
-    fontSize: 40,
   },
   vazioTexto: {
     color: "#555",
@@ -317,9 +312,6 @@ const estilos = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
-  grupoIconeEmoji: {
-    fontSize: 22,
-  },
   grupoInfo: {
     flex: 1,
     gap: 6,
@@ -339,11 +331,6 @@ const estilos = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
     textTransform: "capitalize",
-  },
-  seta: {
-    color: "#444",
-    fontSize: 22,
-    fontWeight: "300",
   },
   divisor: {
     height: 1,
@@ -366,12 +353,6 @@ const estilos = StyleSheet.create({
     borderStyle: "dashed",
     alignItems: "center",
     justifyContent: "center",
-  },
-  botaoCriarIcone: {
-    color: "#00FFD1",
-    fontSize: 22,
-    fontWeight: "300",
-    lineHeight: 24,
   },
   botaoCriarTexto: {
     color: "#00FFD1",

@@ -1,5 +1,15 @@
 import { LocaleConfig } from "react-native-calendars";
 import type { EventoSupabase, Evento } from "@/src/types";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import {
+  faPersonRunning,
+  faPersonBiking,
+  faTableTennisPaddleBall,
+  faVolleyball,
+  faFutbol,
+  faPersonSwimming,
+  faMedal,
+} from "@fortawesome/free-solid-svg-icons";
 
 LocaleConfig.locales["pt"] = {
   monthNames: ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
@@ -33,11 +43,24 @@ export const USUARIO_ATUAL = { iniciais: "", nome: "" };
 
 export const hojeISO = new Date().toISOString().split("T")[0];
 
+export const ICONE_ESPORTE: Record<string, IconDefinition> = {
+  corrida: faPersonRunning,
+  ciclismo: faPersonBiking,
+  tenis: faTableTennisPaddleBall,
+  volei: faVolleyball,
+  futebol: faFutbol,
+  natacao: faPersonSwimming,
+  outro: faMedal,
+};
+
 export const corDoEsporte = (esporte: string): string =>
   COR_ESPORTE[esporte?.toLowerCase()] ?? "#8855FF";
 
 export const emojiDoEsporte = (esporte: string): string =>
   EMOJI_ESPORTE[esporte?.toLowerCase()] ?? "🏅";
+
+export const iconeDoEsporte = (esporte: string): IconDefinition =>
+  ICONE_ESPORTE[esporte?.toLowerCase()] ?? faMedal;
 
 export const iniciaisDoNome = (nome: string): string =>
   (nome ?? "")

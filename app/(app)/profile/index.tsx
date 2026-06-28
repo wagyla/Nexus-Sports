@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,49 +11,96 @@ import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import Navbar from "@/src/components/Navbar";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
+import ModalEventosPerfil from "@/src/components/ModalEventosPerfil";
+import ModalGruposPerfil from "@/src/components/ModalGruposPerfil";
 
-const usuario = {
-  nome: "Leonardo Pinheiro",
-  cidade: "Almenara-MG",
-  iniciais: "LP",
-  eventos: 10,
-  grupos: 2,
-  conquistas: 8,
-  esportesFavoritos: [
-    { nome: "Corrida", cor: "#FF4444" },
-    { nome: "Capoeira", cor: "#FF8800" },
-    { nome: "Vôlei", cor: "#00FFD1" },
-    { nome: "Natação", cor: "#FF4444" },
-  ],
-  atividadesRecentes: [
-    {
-      titulo: "Corrida Praia",
-      data: "12 Abr",
-      distancia: "5km",
-      status: "Concluído",
-    },
-    {
-      titulo: "Pedalada Matinal",
-      data: "12 Abr",
-      distancia: "20km",
-      status: "Concluído",
-    },
-    {
-      titulo: "Corrida Porto",
-      data: "12 Abr",
-      distancia: "5km",
-      status: "Concluído",
-    },
-    {
-      titulo: "Pilates fisocore",
-      data: "12 Abr",
-      distancia: "",
-      status: "Concluído",
-    },
-  ],
+import { useAuth } from "@/src/contexts/AuthContext";
+import { supabase } from "@/utils/supabase";
+import { corDoEsporte, iniciaisDoNome } from "@/src/components/helpers";
+
+type AtividadeEvento = {
+  titulo: string;
+  data: string;
+  distancia: string;
+  status: string;
 };
 
+type GrupoPerfil = {
+  nome: string;
+  esporte: string;
+  membros: number;
+};
+
+const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+
 const Profile = () => {
+  const { user } = useAuth();
+  const [eventos, setEventos] = useState<AtividadeEvento[]>([]);
+  const [grupos, setGrupos] = useState<GrupoPerfil[]>([]);
+  const [modalEventosVisivel, setModalEventosVisivel] = useState(false);
+  const [modalGruposVisivel, setModalGruposVisivel] = useState(false);
+
+
+  const nome: string = user?.user_metadata?.nome ?? "";
+  const cidade: string = user?.user_metadata?.cidade ?? "";
+  const iniciais = iniciaisDoNome(nome);
+  const esportesRaw: string[] = user?.user_metadata?.esportes ?? [];
+  const esportesFavoritos = esportesRaw.map((e) => ({
+    nome: e.charAt(0).toUpperCase() + e.slice(1),
+    cor: corDoEsporte(e),
+  }));
+
+  useEffect(() => {
+    if (!user) return;
+
+    const carregarEventos = async () => {
+      const { data } = await supabase
+        .from("eventos")
+        .select("nome, data_hora")
+        .eq("criador_id", user.id)
+        .order("data_hora", { ascending: false });
+
+      if (data) {
+        setEventos(
+          data.map((e) => {
+            const iso = (e.data_hora ?? "").split("T")[0];
+            const [, mes, dia] = iso.split("-");
+            const dataFormatada =
+              dia && mes ? `${dia} ${MESES[Number(mes) - 1]}` : "";
+            const passado = new Date(e.data_hora) < new Date();
+            return {
+              titulo: e.nome ?? "",
+              data: dataFormatada,
+              distancia: "",
+              status: passado ? "Concluído" : "Agendado",
+            };
+          })
+        );
+      }
+    };
+
+    const carregarGrupos = async () => {
+      const { data } = await supabase
+        .from("grupos")
+        .select("nome, esporte")
+        .eq("criador_id", user.id);
+
+      if (data) {
+        setGrupos(
+          data.map((g) => ({
+            nome: g.nome ?? "",
+            esporte: g.esporte ?? "outro",
+            membros: 0,
+          }))
+        );
+      }
+    };
+
+    carregarEventos();
+    carregarGrupos();
+  }, [user]);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D0D0D" />
@@ -80,66 +127,99 @@ const Profile = () => {
       >
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarTexto}>{usuario.iniciais}</Text>
+            <Text style={styles.avatarTexto}>{iniciais}</Text>
           </View>
-          <Text style={styles.nome}>{usuario.nome}</Text>
-          <Text style={styles.cidade}>{usuario.cidade}</Text>
+          <Text style={styles.nome}>{nome}</Text>
+          {!!cidade && <Text style={styles.cidade}>{cidade}</Text>}
         </View>
 
         <View style={styles.estatistica}>
-          <View style={styles.cartaoEstat}>
-            <Text style={styles.estatNumero}>{usuario.eventos}</Text>
+          <TouchableOpacity
+            style={styles.cartaoEstat}
+            onPress={() => setModalEventosVisivel(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.estatNumero}>{eventos.length}</Text>
             <Text style={styles.estatRotulo}>Eventos</Text>
-          </View>
-          <View style={styles.cartaoEstat}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cartaoEstat}
+            onPress={() => setModalGruposVisivel(true)}
+            activeOpacity={0.7}
+          >
             <Text style={[styles.estatNumero, { color: "#FF8800" }]}>
-              {usuario.grupos}
+              {grupos.length}
             </Text>
             <Text style={styles.estatRotulo}>Grupos</Text>
-          </View>
-          <View style={styles.cartaoEstat}>
-            <Text style={[styles.estatNumero, { color: "#00FFD1" }]}>
-              {usuario.conquistas}
-            </Text>
-            <Text style={styles.estatRotulo}>Conquistas</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
-        <Text style={styles.secaoTitulo}>Esportes Favoritos</Text>
-        <View style={styles.esportes}>
-          {usuario.esportesFavoritos.map((esporte, index) => (
-            <View
-              key={index}
-              style={[
-                styles.esporteTag,
-                { backgroundColor: esporte.cor + "33" },
-              ]}
-            >
-              <Text style={[styles.esporteTexto, { color: esporte.cor }]}>
-                {esporte.nome}
-              </Text>
+        {esportesFavoritos.length > 0 && (
+          <>
+            <Text style={styles.secaoTitulo}>Esportes Favoritos</Text>
+            <View style={styles.esportes}>
+              {esportesFavoritos.map((esporte, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.esporteTag,
+                    { backgroundColor: esporte.cor + "33" },
+                  ]}
+                >
+                  <Text style={[styles.esporteTexto, { color: esporte.cor }]}>
+                    {esporte.nome}
+                  </Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        )}
 
-        <Text style={styles.secaoTitulo}>Atividades Recentes</Text>
-        {usuario.atividadesRecentes.map((atividade, index) => (
-          <View key={index} style={styles.card}>
-            <View>
-              <Text style={styles.cardTitulo}>{atividade.titulo}</Text>
-              <Text style={styles.cardDetalhe}>
-                {atividade.data}
-                {atividade.distancia ? ` · ${atividade.distancia}` : ""}
-              </Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagTexto}>{atividade.status}</Text>
-            </View>
-          </View>
-        ))}
+        {eventos.length > 0 && (
+          <>
+            <Text style={styles.secaoTitulo}>Atividades Recentes</Text>
+            {eventos.slice(0, 4).map((evento, index) => (
+              <View key={index} style={styles.card}>
+                <View>
+                  <Text style={styles.cardTitulo}>{evento.titulo}</Text>
+                  <Text style={styles.cardDetalhe}>
+                    {evento.data}
+                    {evento.distancia ? ` · ${evento.distancia}` : ""}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.tag,
+                    evento.status === "Agendado" && styles.tagAgendado,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.tagTexto,
+                      evento.status === "Agendado" && styles.tagTextoAgendado,
+                    ]}
+                  >
+                    {evento.status}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
       </ScrollView>
 
       <Navbar itemAtivo="perfil" />
+
+      <ModalEventosPerfil
+        visivel={modalEventosVisivel}
+        onFechar={() => setModalEventosVisivel(false)}
+        eventos={eventos}
+      />
+      <ModalGruposPerfil
+        visivel={modalGruposVisivel}
+        onFechar={() => setModalGruposVisivel(false)}
+        grupos={grupos}
+      />
     </View>
   );
 };
@@ -288,5 +368,11 @@ const styles = StyleSheet.create({
     color: "#00FFD1",
     fontSize: 12,
     fontWeight: "bold",
+  },
+  tagAgendado: {
+    backgroundColor: "#FF880033",
+  },
+  tagTextoAgendado: {
+    color: "#FF8800",
   },
 });
