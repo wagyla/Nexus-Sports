@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "../feedStyle";
 import { formatarDataCurta } from "./helpers";
-import type { Evento } from "./types";
+import type { Evento } from "@/src/types";
 
 type Props = {
   evento: Evento;

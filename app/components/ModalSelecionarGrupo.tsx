@@ -14,7 +14,7 @@ import {
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { corDoEsporte, emojiDoEsporte } from "./helpers";
-import type { Grupo } from "./types";
+import type { Grupo } from "@/src/types";
 import { SupabaseTablesEnum } from "@/utils/Enums";
 
 type Props = {

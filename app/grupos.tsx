@@ -13,7 +13,7 @@ import { supabase } from "@/utils/supabase";
 import Navbar from "@/src/componentes/Navbar";
 import GrupoCard from "./components/GrupoCard";
 import ModalGrupo from "./components/ModalGrupo";
-import type { GrupoSupabase, GrupoDisplay } from "./components/types";
+import type { GrupoSupabase, GrupoDisplay } from "@/src/types";
 import { SupabaseTablesEnum } from "@/utils/Enums";
 
 const COLUNAS_GRUPO =

@@ -1,5 +1,5 @@
 import { LocaleConfig } from "react-native-calendars";
-import type { EventoSupabase, Evento } from "./types";
+import type { EventoSupabase, Evento } from "@/src/types";
 
 LocaleConfig.locales["pt"] = {
   monthNames: ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],

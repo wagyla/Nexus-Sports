@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import type { GrupoDisplay } from "./types";
+import type { GrupoDisplay } from "@/src/types";
 
 type Props = {
   grupo: GrupoDisplay;

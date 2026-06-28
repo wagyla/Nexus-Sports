@@ -13,7 +13,7 @@ import {
 import { Calendar } from "react-native-calendars";
 import WheelTimePicker from "@/src/componentes/WheelTimePicker";
 import { formatarDataCompleta, hojeISO, USUARIO_ATUAL } from "./helpers";
-import type { Evento } from "./types";
+import type { Evento } from "@/src/types";
 
 type Props = {
   evento: Evento | null;

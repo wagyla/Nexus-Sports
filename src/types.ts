@@ -1,3 +1,5 @@
+// ─── Supabase (shapes retornados pelo banco) ───────────────────────────────
+
 export type EventoSupabase = {
   id: string;
   nome: string;
@@ -12,6 +14,19 @@ export type EventoSupabase = {
   grupos: { nome: string } | null;
   criador: { id: string; nome: string } | null;
 };
+
+export type GrupoSupabase = {
+  id: string;
+  nome?: string;
+  descricao?: string;
+  esporte?: string;
+  cidade?: string;
+  privado?: boolean;
+  criador_id?: string;
+  criado_em?: string;
+};
+
+// ─── Display (shapes usados nos componentes de UI) ─────────────────────────
 
 export type Evento = {
   id: string;
@@ -33,19 +48,8 @@ export type Evento = {
 export type Grupo = {
   id: string;
   nome: string;
-  esporte: string | null;
-  emoji?: string | null;
-};
-
-export type GrupoSupabase = {
-  id: string;
-  nome?: string;
-  descricao?: string;
   esporte?: string;
-  cidade?: string;
-  privado?: boolean;
-  criador_id?: string;
-  criado_em?: string;
+  emoji?: string;
 };
 
 export type GrupoDisplay = {
@@ -59,4 +63,14 @@ export type GrupoDisplay = {
   isAdmin: boolean;
   participantes: string[];
   coresAvatar: string[];
+};
+
+// ─── Forms (shapes dos formulários locais) ─────────────────────────────────
+
+export type GrupoForm = {
+  nome: string;
+  descricao: string;
+  esporte: string;
+  cidade: string;
+  privado: boolean;
 };

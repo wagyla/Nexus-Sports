@@ -5,7 +5,7 @@ import Navbar from "@/src/componentes/Navbar";
 import styles from "./feedStyle";
 
 import { mapEvento } from "./components/helpers";
-import type { Evento, EventoSupabase } from "./components/types";
+import type { Evento, EventoSupabase } from "@/src/types";
 
 import FeedHeader from "./components/FeedHeader";
 import FeedFiltros from "./components/FeedFiltros";
