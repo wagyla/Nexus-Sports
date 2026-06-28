@@ -21,6 +21,7 @@ export type EventoSupabase = {
   descricao: string | null;
   grupo_id: string | null;
   criador_id: string | null;
+  criado_por: string | null;
   vagas: number | null;
   grupos: { nome: string } | null;
 };
@@ -50,6 +51,7 @@ export type Evento = {
   total: number;
   grupo: string;
   criador: { iniciais: string; nome: string; corAvatar: string };
+  criadorId: string;
   descricao: string;
 };
 
