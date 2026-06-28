@@ -73,13 +73,20 @@ const Feed = () => {
     );
   };
 
-  const esportesUnicos = [...new Set(eventos.map((e) => e.esporte).filter(Boolean))];
-  const filtros = ["Todos", ...esportesUnicos.map(nomeFiltro)];
+  const eventosOrdenados = [
+    ...eventos.filter((e) => e.criadorId !== user?.id),
+    ...eventos.filter((e) => e.criadorId === user?.id),
+  ];
+
+  const esportesUnicos = [...new Set(eventosOrdenados.map((e) => e.esporte).filter(Boolean))];
+  const filtros = ["Todos", ...esportesUnicos.map(nomeFiltro), "Seus Eventos"];
 
   const eventosFiltrados =
     filtroAtivo === "Todos"
-      ? eventos
-      : eventos.filter((e) => nomeFiltro(e.esporte) === filtroAtivo);
+      ? eventosOrdenados
+      : filtroAtivo === "Seus Eventos"
+        ? eventosOrdenados.filter((e) => e.criadorId === user?.id)
+        : eventosOrdenados.filter((e) => nomeFiltro(e.esporte) === filtroAtivo);
 
   return (
     <View style={styles.container}>

@@ -104,6 +104,7 @@ export const mapEvento = (e: EventoSupabase): Evento => {
       nome: "",
       corAvatar: "#6c63ff",
     },
+    criadorId: e.criado_por ?? e.criador_id ?? "",
     descricao: e.descricao ?? "",
   };
 };

@@ -9,7 +9,7 @@ export const getFeedEventos = async (userId: string): ApiResult<EventoSupabase[]
   const { data: grupos, error: erroGrupos } = await supabase
     .from("grupos")
     .select("id")
-    .eq("criado_por", userId);
+    .or(`privado.eq.false,criado_por.eq.${userId}`);
 
   if (erroGrupos) return { data: undefined, error: erroGrupos.message };
 
