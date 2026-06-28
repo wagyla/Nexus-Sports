@@ -17,6 +17,9 @@ import {
   ChipOption,
 } from "@/src/components/Formulario";
 import { router } from "expo-router";
+import { supabase } from "@/utils/supabase";
+import { saveData } from "@/utils/Storage";
+import { SessionStorageKeysEnum } from "@/utils/Enums";
 
 const SPORTS: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -40,7 +43,28 @@ const Register = () => {
     );
   };
 
-  const handleCriarConta = () => {
+  const handleCriarConta = async () => {
+    try {
+      const { data } = await supabase.auth.signUp({
+        email: email,
+        password: senha,
+        options: {
+          data: {
+            nome: nomeCompleto,
+            cidade: cidade,
+          },
+        },
+      });
+
+      const { session, user } = data;
+
+      saveData(SessionStorageKeysEnum.ACCESS_TOKEN, session?.access_token);
+      saveData(SessionStorageKeysEnum.USER_DATA, user);
+
+      router.push("/(app)/feed");
+    } catch (err) {
+      console.error(err);
+    }
     console.log({ nomeCompleto, email, cidade, senha, esportesFavoritos });
   };
 

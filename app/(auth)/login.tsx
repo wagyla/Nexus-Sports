@@ -1,11 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, Image, TextInput, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import style from "./login.styles";
+import { supabase } from "@/utils/supabase";
+import { CreateSessionType } from "@/src/types";
+import { saveData } from "@/utils/Storage";
+import { SessionStorageKeysEnum } from "@/utils/Enums";
 
 const Login = () => {
+  const [userData, setUser] = useState<CreateSessionType>({
+    email: "",
+    password: "",
+  });
+
   const abrirCriarConta = () => {
     router.push("/(auth)/register");
+  };
+
+  const handleLogin = async () => {
+    try {
+      const { data } = await supabase.auth.signInWithPassword(userData);
+      const { session, user } = data;
+      
+      saveData(SessionStorageKeysEnum.ACCESS_TOKEN, session?.access_token);
+      saveData(SessionStorageKeysEnum.USER_DATA, user);
+      router.push("/(app)/feed");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -27,6 +49,7 @@ const Login = () => {
             placeholderTextColor="#555"
             keyboardType="email-address"
             autoCapitalize="none"
+            onChangeText={(e) => setUser((prev) => ({ ...prev, email: e }))}
             style={style.input}
           />
         </View>
@@ -38,6 +61,7 @@ const Login = () => {
             placeholder="*******"
             placeholderTextColor="#555"
             secureTextEntry={true}
+            onChangeText={(e) => setUser((prev) => ({ ...prev, password: e }))}
             style={style.input}
           />
         </View>
@@ -51,10 +75,7 @@ const Login = () => {
       </View>
 
       <View style={style.boxBottom}>
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => router.push("/(app)/feed")}
-        >
+        <TouchableOpacity style={style.button} onPress={handleLogin}>
           <Text style={style.buttonText}>Entrar</Text>
         </TouchableOpacity>
 

@@ -1,5 +1,16 @@
-// ─── Supabase (shapes retornados pelo banco) ───────────────────────────────
 
+export type CreateSessionType = {
+  email: string;
+  password: string;
+}
+
+export type UserType = {
+  id: number;
+  email: string;
+  role: string;
+  phone: string;
+
+}
 export type EventoSupabase = {
   id: string;
   nome: string;
@@ -25,8 +36,6 @@ export type GrupoSupabase = {
   criador_id?: string;
   criado_em?: string;
 };
-
-// ─── Display (shapes usados nos componentes de UI) ─────────────────────────
 
 export type Evento = {
   id: string;
@@ -64,8 +73,6 @@ export type GrupoDisplay = {
   participantes: string[];
   coresAvatar: string[];
 };
-
-// ─── Forms (shapes dos formulários locais) ─────────────────────────────────
 
 export type GrupoForm = {
   nome: string;
