@@ -36,3 +36,27 @@ export type Grupo = {
   esporte: string | null;
   emoji?: string | null;
 };
+
+export type GrupoSupabase = {
+  id: string;
+  nome?: string;
+  descricao?: string;
+  esporte?: string;
+  cidade?: string;
+  privado?: boolean;
+  criador_id?: string;
+  criado_em?: string;
+};
+
+export type GrupoDisplay = {
+  id: string;
+  nome: string;
+  esporte: string;
+  local: string;
+  descricao: string;
+  membros: number;
+  eventos: number;
+  isAdmin: boolean;
+  participantes: string[];
+  coresAvatar: string[];
+};
