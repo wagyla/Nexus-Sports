@@ -12,7 +12,6 @@ import FeedHeader from "@/src/components/FeedHeader";
 import FeedFiltros from "@/src/components/FeedFiltros";
 import EventoCard from "@/src/components/EventoCard";
 import ModalEvento from "@/src/components/ModalEvento";
-import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 
 const FILTROS = ["Todos", "Corrida", "Ciclismo", "Tênis", "Vôlei"];
 
@@ -25,7 +24,6 @@ const Feed = () => {
   const [carregando, setCarregando] = useState(true);
   const [eventoSelecionado, setEventoSelecionado] = useState<Evento | undefined>(undefined);
   const [modalEventoVisivel, setModalEventoVisivel] = useState(false);
-  const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
   
   const carregarEventos = async () => {
@@ -106,21 +104,13 @@ const Feed = () => {
         )}
       </ScrollView>
 
-      <Navbar
-        itemAtivo="feed"
-        onNovoEvento={() => setModalGrupoVisivel(true)}
-      />
+      <Navbar itemAtivo="feed" />
 
       <ModalEvento
         evento={eventoSelecionado}
         visivel={modalEventoVisivel}
         onFechar={fecharModalEvento}
         onSalvar={salvarEvento}
-      />
-
-      <ModalSelecionarGrupo
-        visivel={modalGrupoVisivel}
-        onFechar={() => setModalGrupoVisivel(false)}
       />
     </View>
   );

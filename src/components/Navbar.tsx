@@ -1,81 +1,72 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faUsers, faPlus } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 
 type Props = {
   itemAtivo: "feed" | "grupos" | "novoEvento" | "perfil";
-  onNovoEvento?: () => void;
 };
 
-const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
-  <View style={styles.navbar}>
-    <TouchableOpacity
-      style={styles.navItem}
-      onPress={() => router.push("/(app)/feed")}
-    >
-      <FontAwesomeIcon
-        icon={faHouse}
-        size={22}
-        color={itemAtivo === "feed" ? "#00FFD1" : "#888"}
-      />
-      <Text
-        style={[
-          styles.navTexto,
-          itemAtivo === "feed" && styles.navTextoAtivo,
-        ]}
-      >
-        Feed
-      </Text>
-    </TouchableOpacity>
+const Navbar = ({ itemAtivo }: Props) => {
+  const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
 
-    <TouchableOpacity
-      style={styles.navCentro}
-      onPress={onNovoEvento ?? (() => router.push("/(app)/events/new"))}
-    >
-      <View
-        style={[
-          styles.navCentroBotao,
-          itemAtivo !== "novoEvento" && styles.navCentroBotaoInativo,
-        ]}
-      >
-        <FontAwesomeIcon
-          icon={faPlus}
-          size={22}
-          color={itemAtivo === "novoEvento" ? "#000" : "#888888"}
-        />
+  return (
+    <>
+      <View style={styles.navbar}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/(app)/feed")}
+        >
+          <FontAwesomeIcon
+            icon={faHouse}
+            size={22}
+            color={itemAtivo === "feed" ? "#00FFD1" : "#888"}
+          />
+          <Text style={[styles.navTexto, itemAtivo === "feed" && styles.navTextoAtivo]}>
+            Feed
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navCentro}
+          onPress={() => setModalGrupoVisivel(true)}
+        >
+          <View style={[styles.navCentroBotao, itemAtivo !== "novoEvento" && styles.navCentroBotaoInativo]}>
+            <FontAwesomeIcon
+              icon={faPlus}
+              size={22}
+              color={itemAtivo === "novoEvento" ? "#000" : "#888888"}
+            />
+          </View>
+          <Text style={[styles.navTextoCentro, itemAtivo !== "novoEvento" && styles.navTextoCentroInativo]}>
+            Novo Evento
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/(app)/groups")}
+        >
+          <FontAwesomeIcon
+            icon={faUsers}
+            size={22}
+            color={itemAtivo === "grupos" ? "#00FFD1" : "#888"}
+          />
+          <Text style={[styles.navTexto, itemAtivo === "grupos" && styles.navTextoAtivo]}>
+            Grupos
+          </Text>
+        </TouchableOpacity>
       </View>
-      <Text
-        style={[
-          styles.navTextoCentro,
-          itemAtivo !== "novoEvento" && styles.navTextoCentroInativo,
-        ]}
-      >
-        Novo Evento
-      </Text>
-    </TouchableOpacity>
 
-    <TouchableOpacity
-      style={styles.navItem}
-      onPress={() => router.push("/(app)/groups")}
-    >
-      <FontAwesomeIcon
-        icon={faUsers}
-        size={22}
-        color={itemAtivo === "grupos" ? "#00FFD1" : "#888"}
+      <ModalSelecionarGrupo
+        visivel={modalGrupoVisivel}
+        onFechar={() => setModalGrupoVisivel(false)}
       />
-      <Text
-        style={[
-          styles.navTexto,
-          itemAtivo === "grupos" && styles.navTextoAtivo,
-        ]}
-      >
-        Grupos
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
+    </>
+  );
+};
 
 export default Navbar;
 
