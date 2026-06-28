@@ -34,10 +34,26 @@ const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
       style={styles.navCentro}
       onPress={onNovoEvento ?? (() => router.push("/(app)/events/new"))}
     >
-      <View style={styles.navCentroBotao}>
-        <FontAwesomeIcon icon={faPlus} size={22} color="#000" />
+      <View
+        style={[
+          styles.navCentroBotao,
+          itemAtivo !== "novoEvento" && styles.navCentroBotaoInativo,
+        ]}
+      >
+        <FontAwesomeIcon
+          icon={faPlus}
+          size={22}
+          color={itemAtivo === "novoEvento" ? "#000" : "#888888"}
+        />
       </View>
-      <Text style={styles.navTextoCentro}>Novo Evento</Text>
+      <Text
+        style={[
+          styles.navTextoCentro,
+          itemAtivo !== "novoEvento" && styles.navTextoCentroInativo,
+        ]}
+      >
+        Novo Evento
+      </Text>
     </TouchableOpacity>
 
     <TouchableOpacity
@@ -104,9 +120,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  navCentroBotaoInativo: {
+    backgroundColor: "#333",
+  },
   navTextoCentro: {
     color: "#00FFD1",
     fontSize: 11,
     marginTop: 2,
+  },
+  navTextoCentroInativo: {
+    color: "#888888",
   },
 });
