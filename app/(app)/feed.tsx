@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { supabase } from "@/utils/supabase";
-import Navbar from "@/src/componentes/Navbar";
-import styles from "./feedStyle";
+import Navbar from "@/src/components/Navbar";
+import styles from "@/src/styles/feed.styles";
 
-import { mapEvento } from "./components/helpers";
+import { mapEvento } from "@/src/components/helpers";
 import type { Evento, EventoSupabase } from "@/src/types";
 
-import FeedHeader from "./components/FeedHeader";
-import FeedFiltros from "./components/FeedFiltros";
-import EventoCard from "./components/EventoCard";
-import ModalEvento from "./components/ModalEvento";
-import ModalSelecionarGrupo from "./components/ModalSelecionarGrupo";
+import FeedHeader from "@/src/components/FeedHeader";
+import FeedFiltros from "@/src/components/FeedFiltros";
+import EventoCard from "@/src/components/EventoCard";
+import ModalEvento from "@/src/components/ModalEvento";
+import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 
 const FILTROS = ["Todos", "Corrida", "Ciclismo", "Tênis", "Vôlei"];
 
 const Feed = () => {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
+  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
+    null,
+  );
   const [modalEventoVisivel, setModalEventoVisivel] = useState(false);
   const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
@@ -41,7 +43,9 @@ const Feed = () => {
   useEffect(() => {
     carregarEventos();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
       carregarEventos();
     });
 
@@ -57,10 +61,10 @@ const Feed = () => {
 
   const salvarEvento = (id: string, dadosAtualizados: Partial<Evento>) => {
     setEventos((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...dadosAtualizados } : e))
+      prev.map((e) => (e.id === id ? { ...e, ...dadosAtualizados } : e)),
     );
     setEventoSelecionado((prev) =>
-      prev?.id === id ? { ...prev, ...dadosAtualizados } : prev
+      prev?.id === id ? { ...prev, ...dadosAtualizados } : prev,
     );
   };
 

@@ -10,11 +10,11 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
+import Navbar from "@/src/components/Navbar";
+import GrupoCard from "@/src/components/GrupoCard";
+import ModalGrupo from "@/src/components/ModalGrupo";
 import type { GrupoSupabase, GrupoDisplay } from "@/src/types";
 import { SupabaseTablesEnum } from "@/utils/Enums";
-import GrupoCard from "@/src/components/GrupoCard";
-import Navbar from "@/src/components/Navbar";
-import ModalGrupo from "@/src/components/ModalGrupo";
 
 const COLUNAS_GRUPO =
   "id, nome, descricao, esporte, cidade, privado, criador_id, criado_em";
@@ -32,7 +32,7 @@ const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
   coresAvatar: [],
 });
 
-const GruposScreen = () => {
+const Groups = () => {
   const [meusGrupos, setMeusGrupos] = useState<GrupoDisplay[]>([]);
   const [descobrirGrupos, setDescobrirGrupos] = useState<GrupoDisplay[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -46,10 +46,6 @@ const GruposScreen = () => {
     setCarregando(true);
 
     const user = { id: 1 };
-
-    // const {
-    //   data: { user },
-    // } = await supabase.auth.getUser();
 
     if (!user) {
       setCarregando(false);
@@ -156,7 +152,7 @@ const GruposScreen = () => {
   );
 };
 
-export default GruposScreen;
+export default Groups;
 
 const estilos = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0D0D0D", paddingTop: 40 },

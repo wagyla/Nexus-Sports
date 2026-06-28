@@ -4,29 +4,24 @@ import { View, Text, Animated, PanResponder, StyleSheet } from "react-native";
 const ITEM_H = 50;
 const VISIBLE = 5;
 const PICKER_H = ITEM_H * VISIBLE;
-const PAD = Math.floor(VISIBLE / 2) * ITEM_H; // 100 — espaço para centralizar o 1º item
+const PAD = Math.floor(VISIBLE / 2) * ITEM_H;
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const MINUTES = Array.from({ length: 12 }, (_, i) =>
   String(i * 5).padStart(2, "0")
 );
 
-// translateY quando item `i` está centralizado na janela
 function toY(i: number) {
   return -i * ITEM_H + PAD;
 }
 
-// índice mais próximo dado o translateY atual
 function toIndex(y: number, total: number) {
   return Math.max(0, Math.min(Math.round((PAD - y) / ITEM_H), total - 1));
 }
 
-// impede scroll além do primeiro / último item
 function clampY(y: number, total: number) {
   return Math.max(-(total - 1) * ITEM_H + PAD, Math.min(PAD, y));
 }
-
-// ─── Coluna ───────────────────────────────────────────────────────────────────
 
 type ColumnProps = {
   items: string[];
@@ -59,14 +54,12 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
 
   const pan = useRef(
     PanResponder.create({
-      // captura o toque antes do ScrollView pai
       onStartShouldSetPanResponder: () => true,
       onStartShouldSetPanResponderCapture: () => true,
       onMoveShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponderCapture: () => true,
 
       onPanResponderGrant: () => {
-        // interrompe qualquer spring em andamento e congela o valor atual
         translateY.stopAnimation((v) => {
           startY.current = v;
           translateY.setValue(v);
@@ -79,7 +72,6 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
 
       onPanResponderRelease: (_, { dy, vy }) => {
         const released = clampY(startY.current + dy, items.length);
-        // inercia: quanto mais rápido o flick, mais longe vai
         const withInertia = clampY(released + vy * ITEM_H * 4, items.length);
         snap(toIndex(withInertia, items.length));
       },
@@ -97,7 +89,6 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
     >
       <Animated.View style={{ transform: [{ translateY }] }}>
         {items.map((label, i) => {
-          // centerY: valor de translateY em que este item fica centralizado
           const centerY = toY(i);
           const inputRange = [
             centerY - 2 * ITEM_H,
@@ -132,14 +123,12 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
-
 type Props = {
-  value: string; // "HH:MM"
+  value: string;
   onChange: (time: string) => void;
 };
 
-export default function WheelTimePicker({ value, onChange }: Props) {
+const WheelTimePicker = ({ value, onChange }: Props) => {
   const match = value.match(/^(\d{1,2}):(\d{2})$/);
   const initH = Math.min(parseInt(match?.[1] ?? "0", 10), 23);
   const initM = Math.min(Math.round(parseInt(match?.[2] ?? "0", 10) / 5), 11);
@@ -149,7 +138,6 @@ export default function WheelTimePicker({ value, onChange }: Props) {
 
   return (
     <View style={s.wrapper}>
-      {/* Linha de destaque do item central */}
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <View style={s.highlight} />
       </View>
@@ -179,9 +167,9 @@ export default function WheelTimePicker({ value, onChange }: Props) {
       </View>
     </View>
   );
-}
+};
 
-// ─── Estilos ──────────────────────────────────────────────────────────────────
+export default WheelTimePicker;
 
 const s = StyleSheet.create({
   wrapper: {

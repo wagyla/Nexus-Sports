@@ -1,21 +1,5 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import Login from "./login";
-import { router } from 'expo-router';
+import { Redirect } from "expo-router";
 
-export default function Index() {
-    return (
-            <Login />
-    );
-}
+const Index = () => <Redirect href="/(auth)/login" />;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#000',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%'
-    },
-});
+export default Index;

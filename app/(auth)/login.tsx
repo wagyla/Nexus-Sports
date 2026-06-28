@@ -1,19 +1,18 @@
 import React from "react";
 import { Text, View, Image, TextInput, TouchableOpacity } from "react-native";
-
 import { router } from "expo-router";
-import style from "./styles";
+import style from "./login.styles";
 
-export default function Login() {
-  function abrirCriarConta() {
-    router.push("/CriarContaScreen");
-  }
+const Login = () => {
+  const abrirCriarConta = () => {
+    router.push("/(auth)/register");
+  };
 
   return (
     <View style={style.container}>
       <View style={style.boxTop}>
         <Image
-          source={require("../assets/images/logo-nexus.png")}
+          source={require("../../assets/images/logo-nexus.png")}
           style={style.logo}
           resizeMode="contain"
         />
@@ -44,7 +43,7 @@ export default function Login() {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push("/EsqueceuSenha")}
+          onPress={() => router.push("/(auth)/forgot-password")}
           style={style.forgotContainer}
         >
           <Text style={style.forgotText}>Esqueceu a senha?</Text>
@@ -54,7 +53,7 @@ export default function Login() {
       <View style={style.boxBottom}>
         <TouchableOpacity
           style={style.button}
-          onPress={() => router.push("/Feed")}
+          onPress={() => router.push("/(app)/feed")}
         >
           <Text style={style.buttonText}>Entrar</Text>
         </TouchableOpacity>
@@ -69,4 +68,6 @@ export default function Login() {
       </View>
     </View>
   );
-}
+};
+
+export default Login;

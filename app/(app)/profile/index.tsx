@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import Navbar from "@/src/componentes/Navbar";
+import Navbar from "@/src/components/Navbar";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
 
 const usuario = {
@@ -53,7 +53,7 @@ const usuario = {
   ],
 };
 
-export default function Perfil() {
+const Profile = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D0D0D" />
@@ -67,7 +67,7 @@ export default function Perfil() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.botaoEditar}
-          onPress={() => router.push("/EditarPerfil")}
+          onPress={() => router.push("/(app)/profile/edit")}
         >
           <FontAwesomeIcon icon={faPencil} size={14} color="#00FFD1" />
           <Text style={styles.botaoEditarTexto}>Editar</Text>
@@ -142,7 +142,9 @@ export default function Perfil() {
       <Navbar itemAtivo="perfil" />
     </View>
   );
-}
+};
+
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {

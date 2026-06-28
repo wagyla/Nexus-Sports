@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   RowFields,
   ChipOption,
-} from "@/src/componentes/Formulario";
+} from "@/src/components/Formulario";
 import { router } from "expo-router";
 
 const ESPORTES: ChipOption[] = [
@@ -34,7 +34,7 @@ const NIVEIS: ChipOption[] = [
   { label: "+Outro", value: "outro" },
 ];
 
-export default function CriarEventoScreen({ navigation }: any) {
+const NewEvent = () => {
   const [nomeEvento, setNomeEvento] = useState("");
   const [grupoOrganizador, setGrupoOrganizador] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -168,7 +168,9 @@ export default function CriarEventoScreen({ navigation }: any) {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default NewEvent;
 
 const styles = StyleSheet.create({
   safe: {

@@ -15,7 +15,7 @@ import {
   ChipSelector,
   PrimaryButton,
   ChipOption,
-} from "@/src/componentes/Formulario";
+} from "@/src/components/Formulario";
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { SupabaseTablesEnum } from "@/utils/Enums";
@@ -45,7 +45,7 @@ const ESPORTES: ChipOption[] = [
   { label: "Outro", value: "outro" },
 ];
 
-const CriarGrupoScreen = () => {
+const NewGroup = () => {
   const [grupo, setGrupo] = useState<GrupoForm>(FORM_INICIAL);
 
   const set =
@@ -54,7 +54,10 @@ const CriarGrupoScreen = () => {
       setGrupo((prev) => ({ ...prev, [campo]: valor }));
 
   const toggleEsporte = (value: string) =>
-    setGrupo((prev) => ({ ...prev, esporte: prev.esporte === value ? "" : value }));
+    setGrupo((prev) => ({
+      ...prev,
+      esporte: prev.esporte === value ? "" : value,
+    }));
 
   const criarGrupo = async () => {
     try {
@@ -130,7 +133,9 @@ const CriarGrupoScreen = () => {
             <View>
               <Text style={styles.privadoLabel}>Grupo privado</Text>
               <Text style={styles.privadoSub}>
-                {grupo.privado ? "Somente por convite" : "Qualquer pessoa pode encontrar"}
+                {grupo.privado
+                  ? "Somente por convite"
+                  : "Qualquer pessoa pode encontrar"}
               </Text>
             </View>
             <Switch
@@ -141,14 +146,18 @@ const CriarGrupoScreen = () => {
             />
           </View>
 
-          <PrimaryButton title="Criar Grupo" onPress={criarGrupo} style={{ marginTop: 24 }} />
+          <PrimaryButton
+            title="Criar Grupo"
+            onPress={criarGrupo}
+            style={{ marginTop: 24 }}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-export default CriarGrupoScreen;
+export default NewGroup;
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#000" },

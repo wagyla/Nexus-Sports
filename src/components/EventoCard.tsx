@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import styles from "../feedStyle";
+import styles from "@/src/styles/feed.styles";
 import { formatarDataCurta } from "./helpers";
 import type { Evento } from "@/src/types";
 

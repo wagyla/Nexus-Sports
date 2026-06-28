@@ -15,7 +15,7 @@ import {
   PrimaryButton,
   RowFields,
   ChipOption,
-} from "@/src/componentes/Formulario";
+} from "@/src/components/Formulario";
 import { router } from "expo-router";
 
 const SPORTS: ChipOption[] = [
@@ -27,7 +27,7 @@ const SPORTS: ChipOption[] = [
   { label: "+Outro", value: "outro" },
 ];
 
-export default function CriarContaScreen({ navigation }: any) {
+const Register = () => {
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [email, setEmail] = useState("");
   const [cidade, setCidade] = useState("");
@@ -111,7 +111,7 @@ export default function CriarContaScreen({ navigation }: any) {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Já tem uma conta? </Text>
-            <TouchableOpacity onPress={() => router.push("/login")}>
+            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
               <Text style={styles.footerLink}>Entrar</Text>
             </TouchableOpacity>
           </View>
@@ -119,7 +119,9 @@ export default function CriarContaScreen({ navigation }: any) {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default Register;
 
 const styles = StyleSheet.create({
   safe: {

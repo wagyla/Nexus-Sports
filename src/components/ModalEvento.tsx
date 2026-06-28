@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import WheelTimePicker from "@/src/componentes/WheelTimePicker";
+import WheelTimePicker from "@/src/components/WheelTimePicker";
 import { formatarDataCompleta, hojeISO, USUARIO_ATUAL } from "./helpers";
 import type { Evento } from "@/src/types";
 

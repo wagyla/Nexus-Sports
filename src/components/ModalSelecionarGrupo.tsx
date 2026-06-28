@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
+import { corDoEsporte, emojiDoEsporte } from "./helpers";
 import type { Grupo } from "@/src/types";
 import { SupabaseTablesEnum } from "@/utils/Enums";
-import { corDoEsporte, emojiDoEsporte } from "@/src/components/helpers";
 
 type Props = {
   visivel: boolean;
@@ -50,9 +50,7 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const carregarGrupos = async () => {
     setCarregando(true);
 
-    const { data, error } = await supabase
-      .from(SupabaseTablesEnum.GRUPOS)
-      .select("*");
+    const { data, error } = await supabase.from(SupabaseTablesEnum.GRUPOS).select("*");
     if (!error && data) {
       setGrupos(data as Grupo[]);
     }
@@ -66,14 +64,14 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const handleSelecionarGrupo = (grupo: Grupo) => {
     onFechar();
     router.push({
-      pathname: "/(app)/events/new",
+      pathname: "/(app)/criar-evento",
       params: { grupoId: grupo.id, grupoNome: grupo.nome },
     });
   };
 
   const handleCriarGrupo = () => {
     onFechar();
-    router.push("/(app)/groups/new");
+    router.push("/(app)/criar-grupo");
   };
 
   return (

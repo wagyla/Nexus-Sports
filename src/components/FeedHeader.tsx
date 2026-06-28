@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import styles from "../feedStyle";
+import styles from "@/src/styles/feed.styles";
 
 type Props = {
   saudacao: string;
@@ -15,7 +15,7 @@ const FeedHeader = ({ saudacao, subtitulo, iniciais }: Props) => (
       <Text style={styles.saudacao}>{saudacao}</Text>
       <Text style={styles.subtitulo}>{subtitulo}</Text>
     </View>
-    <TouchableOpacity style={styles.avatar} onPress={() => router.push("/Perfil")}>
+    <TouchableOpacity style={styles.avatar} onPress={() => router.push("/(app)/perfil")}>
       <Text style={styles.avatarTexto}>{iniciais}</Text>
     </TouchableOpacity>
   </View>

@@ -14,7 +14,7 @@ import {
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
-import { ChipSelector, ChipOption } from "@/src/componentes/Formulario";
+import { ChipSelector, ChipOption } from "@/src/components/Formulario";
 
 const ESPORTES: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -26,7 +26,7 @@ const ESPORTES: ChipOption[] = [
   { label: "+Outro", value: "outro" },
 ];
 
-export default function EditarPerfilScreen() {
+const EditProfile = () => {
   const [nome, setNome] = useState("Leonardo Pinheiro");
   const [cidade, setCidade] = useState("Almenara-MG");
   const [email, setEmail] = useState("leonardo@email.com");
@@ -61,7 +61,7 @@ export default function EditarPerfilScreen() {
     Alert.alert(
       "Perfil atualizado!",
       "Suas informações foram salvas com sucesso.",
-      [{ text: "OK", onPress: () => router.push("/Perfil") }],
+      [{ text: "OK", onPress: () => router.push("/(app)/profile") }],
     );
   };
 
@@ -76,18 +76,16 @@ export default function EditarPerfilScreen() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={estilos.scroll}
         >
-          {/* Cabeçalho */}
           <View style={estilos.cabecalho}>
             <TouchableOpacity
               style={estilos.botaoVoltar}
-              onPress={() => router.push("/Perfil")}
+              onPress={() => router.push("/(app)/profile")}
             >
               <Text style={estilos.botaoVoltarTexto}>‹</Text>
               <Text style={estilos.titulo}>Editar Perfil</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Avatar */}
           <View style={estilos.avatarContainer}>
             <View style={estilos.avatar}>
               <Text style={estilos.avatarTexto}>{iniciais || "?"}</Text>
@@ -100,7 +98,6 @@ export default function EditarPerfilScreen() {
             </Text>
           </View>
 
-          {/* Campos */}
           <Text style={estilos.secaoTitulo}>INFORMAÇÕES PESSOAIS</Text>
 
           <Text style={estilos.label}>Nome completo</Text>
@@ -136,7 +133,6 @@ export default function EditarPerfilScreen() {
             />
           </View>
 
-          {/* Esportes */}
           <Text style={[estilos.secaoTitulo, { marginTop: 10 }]}>
             ESPORTES FAVORITOS
           </Text>
@@ -146,14 +142,13 @@ export default function EditarPerfilScreen() {
             onToggle={toggleEsporte}
           />
 
-          {/* Botões */}
           <TouchableOpacity style={estilos.botaoSalvar} onPress={handleSalvar}>
             <Text style={estilos.botaoSalvarTexto}>Salvar alterações</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={estilos.botaoCancelar}
-            onPress={() => router.push("/Perfil")}
+            onPress={() => router.push("/(app)/profile")}
           >
             <Text style={estilos.botaoCancelarTexto}>Cancelar</Text>
           </TouchableOpacity>
@@ -161,7 +156,9 @@ export default function EditarPerfilScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
+
+export default EditProfile;
 
 const estilos = StyleSheet.create({
   container: {

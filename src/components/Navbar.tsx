@@ -5,7 +5,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
 type Props = {
-  itemAtivo: "feed" | "grupos" | "novoEvento";
+  itemAtivo: "feed" | "grupos" | "novoEvento" | "perfil";
   onNovoEvento?: () => void;
 };
 
@@ -13,7 +13,7 @@ const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
   <View style={styles.navbar}>
     <TouchableOpacity
       style={styles.navItem}
-      onPress={() => router.push("/Feed")}
+      onPress={() => router.push("/(app)/feed")}
     >
       <FontAwesomeIcon
         icon={faHouse}
@@ -32,7 +32,7 @@ const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
 
     <TouchableOpacity
       style={styles.navCentro}
-      onPress={onNovoEvento ?? (() => router.push("/CriarEventoScreen"))}
+      onPress={onNovoEvento ?? (() => router.push("/(app)/events/new"))}
     >
       <View style={styles.navCentroBotao}>
         <FontAwesomeIcon icon={faPlus} size={22} color="#000" />
@@ -42,7 +42,7 @@ const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
 
     <TouchableOpacity
       style={styles.navItem}
-      onPress={() => router.push("/grupos")}
+      onPress={() => router.push("/(app)/groups")}
     >
       <FontAwesomeIcon
         icon={faUsers}

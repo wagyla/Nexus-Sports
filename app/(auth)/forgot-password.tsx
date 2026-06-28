@@ -9,19 +9,19 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 
-export default function EsqueceuSenha() {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [erro, setErro] = useState("");
 
-  function handleEnviar() {
+  const handleEnviar = () => {
     if (!email || !email.includes("@")) {
       setErro("Digite um endereço de e-mail válido.");
       return;
     }
     setErro("");
     setEnviado(true);
-  }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -73,14 +73,16 @@ export default function EsqueceuSenha() {
 
         <View style={styles.rodape}>
           <Text style={styles.rodapeTexto}>Lembrou a senha? </Text>
-          <TouchableOpacity onPress={() => router.push("/login")}>
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
             <Text style={styles.rodapeLink}>Entrar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
   );
-}
+};
+
+export default ForgotPassword;
 
 const styles = StyleSheet.create({
   safe: {
