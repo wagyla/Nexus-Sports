@@ -16,7 +16,7 @@ import {
   RowFields,
   ChipOption,
 } from "@/src/components/Formulario";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 const ESPORTES: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -35,8 +35,8 @@ const NIVEIS: ChipOption[] = [
 ];
 
 const NewEvent = () => {
+  const { grupoId, grupoNome } = useLocalSearchParams<{ grupoId: string; grupoNome: string }>();
   const [nomeEvento, setNomeEvento] = useState("");
-  const [grupoOrganizador, setGrupoOrganizador] = useState("");
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
   const [horario, setHorario] = useState("");
@@ -58,7 +58,8 @@ const NewEvent = () => {
   const handleCriarEvento = () => {
     console.log({
       nomeEvento,
-      grupoOrganizador,
+      grupoId,
+      grupoNome,
       descricao,
       data,
       horario,
@@ -99,13 +100,6 @@ const NewEvent = () => {
             placeholder="Ex: Futevôlei na Prainha"
             value={nomeEvento}
             onChangeText={setNomeEvento}
-          />
-
-          <FormField
-            label="Grupo Organizador"
-            placeholder="Ex: Vôlei jequi"
-            value={grupoOrganizador}
-            onChangeText={setGrupoOrganizador}
           />
 
           <FormField
