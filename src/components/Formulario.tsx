@@ -126,6 +126,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 14,
     color: '#fff',
+    // @ts-ignore - web only
+    outlineWidth: 0,
   },
   inputFocused: {
     borderColor: '#00FFD1',

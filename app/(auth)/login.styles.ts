@@ -51,8 +51,11 @@ const style = StyleSheet.create({
     marginTop: 4,
   },
   input: {
+    flex: 1,
     color: "#fff",
     fontSize: 14,
+    // @ts-ignore - web only
+    outlineWidth: 0,
   },
   button: {
     width: "100%",
