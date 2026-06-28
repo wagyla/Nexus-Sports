@@ -67,13 +67,6 @@ const Login = () => {
         </View>
 
         {erro ? <Text style={style.errorText}>{erro}</Text> : null}
-
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/forgot-password")}
-          style={style.forgotContainer}
-        >
-          <Text style={style.forgotText}>Esqueceu a senha?</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={style.boxBottom}>

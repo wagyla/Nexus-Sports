@@ -80,15 +80,6 @@ const style = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  forgotContainer: {
-    alignSelf: "flex-end",
-    marginTop: 8,
-    marginRight: 5,
-  },
-  forgotText: {
-    color: "#00FFD1",
-    fontSize: 13,
-  },
   errorText: {
     color: "#FF6666",
     fontSize: 12,
