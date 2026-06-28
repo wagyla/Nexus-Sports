@@ -12,8 +12,6 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { ChipSelector, ChipOption } from "@/src/components/Formulario";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/utils/supabase";
@@ -102,9 +100,6 @@ const EditProfile = () => {
           <View style={estilos.avatarContainer}>
             <View style={estilos.avatar}>
               <Text style={estilos.avatarTexto}>{iniciais || "?"}</Text>
-              <View style={estilos.cameraBadge}>
-                <FontAwesomeIcon icon={faCamera} size={12} color="#000" />
-              </View>
             </View>
             <Text style={estilos.avatarDica}>
               Gerado pelas iniciais do nome
@@ -226,19 +221,6 @@ const estilos = StyleSheet.create({
     color: "#00FFD1",
     fontSize: 30,
     fontWeight: "bold",
-  },
-  cameraBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#00FFD1",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#0D0D0D",
   },
   avatarDica: {
     color: "#555",
