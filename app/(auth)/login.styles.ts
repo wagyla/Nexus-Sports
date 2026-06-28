@@ -89,6 +89,15 @@ const style = StyleSheet.create({
     color: "#00FFD1",
     fontSize: 13,
   },
+  errorText: {
+    color: "#FF6666",
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 5,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
 });
 
 export default style;

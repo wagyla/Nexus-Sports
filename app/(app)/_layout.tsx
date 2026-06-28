@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
+import AuthGuard from "@/src/components/AuthGuard";
 
-const AppLayout = () => <Stack screenOptions={{ headerShown: false }} />;
+const AppLayout = () => (
+  <AuthGuard>
+    <Stack screenOptions={{ headerShown: false }} />
+  </AuthGuard>
+);
 
 export default AppLayout;

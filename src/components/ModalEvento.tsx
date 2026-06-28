@@ -16,7 +16,7 @@ import { formatarDataCompleta, hojeISO, USUARIO_ATUAL } from "./helpers";
 import type { Evento } from "@/src/types";
 
 type Props = {
-  evento: Evento | null;
+  evento?: Evento;
   visivel: boolean;
   onFechar: () => void;
   onSalvar: (id: string, dados: Partial<Evento>) => void;

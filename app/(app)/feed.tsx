@@ -4,8 +4,9 @@ import { supabase } from "@/utils/supabase";
 import Navbar from "@/src/components/Navbar";
 import styles from "@/src/styles/feed.styles";
 
-import { mapEvento } from "@/src/components/helpers";
+import { mapEvento, iniciaisDoNome } from "@/src/components/helpers";
 import type { Evento, EventoSupabase } from "@/src/types";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 import FeedHeader from "@/src/components/FeedHeader";
 import FeedFiltros from "@/src/components/FeedFiltros";
@@ -16,11 +17,13 @@ import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 const FILTROS = ["Todos", "Corrida", "Ciclismo", "Tênis", "Vôlei"];
 
 const Feed = () => {
+  const { user } = useAuth();
+  const nome: string = user?.user_metadata?.nome ?? "Usuário";
+  const iniciais = iniciaisDoNome(nome);
+
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
-    null,
-  );
+  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | undefined>(undefined);
   const [modalEventoVisivel, setModalEventoVisivel] = useState(false);
   const [modalGrupoVisivel, setModalGrupoVisivel] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("Todos");
@@ -53,9 +56,6 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    carregarUsuario();
-    carregarEventos();
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {

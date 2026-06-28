@@ -8,19 +8,29 @@ import {
   SafeAreaView,
 } from "react-native";
 import { router } from "expo-router";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 const ForgotPassword = () => {
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleEnviar = () => {
+  const handleEnviar = async () => {
     if (!email || !email.includes("@")) {
       setErro("Digite um endereço de e-mail válido.");
       return;
     }
     setErro("");
-    setEnviado(true);
+    setLoading(true);
+    const { error } = await resetPassword(email);
+    setLoading(false);
+    if (error) {
+      setErro(error);
+    } else {
+      setEnviado(true);
+    }
   };
 
   return (
@@ -57,8 +67,12 @@ const ForgotPassword = () => {
         {erro ? <Text style={styles.textoErro}>{erro}</Text> : null}
 
         {!enviado ? (
-          <TouchableOpacity style={styles.botao} onPress={handleEnviar}>
-            <Text style={styles.botaoTexto}>Enviar link</Text>
+          <TouchableOpacity
+            style={[styles.botao, loading && { opacity: 0.6 }]}
+            onPress={handleEnviar}
+            disabled={loading}
+          >
+            <Text style={styles.botaoTexto}>{loading ? "Enviando..." : "Enviar link"}</Text>
           </TouchableOpacity>
         ) : (
           <View style={styles.bannerSucesso}>

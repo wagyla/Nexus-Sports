@@ -17,9 +17,7 @@ import {
   ChipOption,
 } from "@/src/components/Formulario";
 import { router } from "expo-router";
-import { supabase } from "@/utils/supabase";
-import { saveData } from "@/utils/Storage";
-import { SessionStorageKeysEnum } from "@/utils/Enums";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 const SPORTS: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -31,11 +29,14 @@ const SPORTS: ChipOption[] = [
 ];
 
 const Register = () => {
+  const { signUp } = useAuth();
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [email, setEmail] = useState("");
   const [cidade, setCidade] = useState("");
   const [senha, setSenha] = useState("");
   const [esportesFavoritos, setEsportesFavoritos] = useState<string[]>([]);
+  const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const toggleEsporte = (value: string) => {
     setEsportesFavoritos((prev) =>
@@ -44,28 +45,19 @@ const Register = () => {
   };
 
   const handleCriarConta = async () => {
-    try {
-      const { data } = await supabase.auth.signUp({
-        email: email,
-        password: senha,
-        options: {
-          data: {
-            nome: nomeCompleto,
-            cidade: cidade,
-          },
-        },
-      });
-
-      const { session, user } = data;
-
-      saveData(SessionStorageKeysEnum.ACCESS_TOKEN, session?.access_token);
-      saveData(SessionStorageKeysEnum.USER_DATA, user);
-
-      router.push("/(app)/feed");
-    } catch (err) {
-      console.error(err);
+    if (!nomeCompleto || !email || !senha) {
+      setErro("Preencha nome, e-mail e senha.");
+      return;
     }
-    console.log({ nomeCompleto, email, cidade, senha, esportesFavoritos });
+    setErro("");
+    setLoading(true);
+    const { error } = await signUp(email, senha, {
+      nome: nomeCompleto,
+      cidade,
+      esportes: esportesFavoritos,
+    });
+    setLoading(false);
+    if (error) setErro(error);
   };
 
   return (
@@ -127,9 +119,14 @@ const Register = () => {
             containerStyle={{ marginTop: 4 }}
           />
 
+          {erro ? (
+            <Text style={styles.errorText}>{erro}</Text>
+          ) : null}
+
           <PrimaryButton
-            title="Criar Conta"
+            title={loading ? "Criando..." : "Criar Conta"}
             onPress={handleCriarConta}
+            disabled={loading}
             style={{ marginTop: 16 }}
           />
 
@@ -181,5 +178,12 @@ const styles = StyleSheet.create({
     color: "#00FFD1",
     fontSize: 14,
     fontWeight: "600",
+  },
+  errorText: {
+    color: "#FF6666",
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 8,
+    marginLeft: 2,
   },
 });
