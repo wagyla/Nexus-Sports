@@ -17,6 +17,8 @@ import {
   ChipOption,
 } from "@/src/componentes/Formulario";
 import { router } from "expo-router";
+import { supabase } from "@/utils/supabase";
+import { SupabaseTablesEnum } from "@/utils/Enums";
 
 const ESPORTES: ChipOption[] = [
   { label: "Corrida", value: "corrida" },
@@ -64,7 +66,22 @@ export default function CriarGrupoScreen({ navigation }: any) {
     setNovoMembro("");
   };
 
-  const handleCriarGrupo = () => {
+  const handleCriarGrupo = async() => {
+    console.log("YAHUUU")
+    try {
+      const result = await supabase.from(SupabaseTablesEnum.GRUPOS).insert({
+        nome: nomeGrupo,
+        descricao: descricao,
+        esporte: esportes[0] ?? undefined,
+        cidade: "Almenara",
+        privado: false,
+      })
+
+      console.log(result)
+    }catch(err){
+      console.error(err)
+    }
+
     console.log({
       nomeGrupo,
       descricao,

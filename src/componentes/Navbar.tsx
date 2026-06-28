@@ -6,61 +6,62 @@ import { router } from "expo-router";
 
 type Props = {
   itemAtivo: "feed" | "grupos" | "novoEvento";
+  onNovoEvento?: () => void;
 };
 
-export default function Navbar({ itemAtivo }: Props) {
-  return (
-    <View style={styles.navbar}>
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => router.push("/Feed")}
+const Navbar = ({ itemAtivo, onNovoEvento }: Props) => (
+  <View style={styles.navbar}>
+    <TouchableOpacity
+      style={styles.navItem}
+      onPress={() => router.push("/Feed")}
+    >
+      <FontAwesomeIcon
+        icon={faHouse}
+        size={22}
+        color={itemAtivo === "feed" ? "#00FFD1" : "#888"}
+      />
+      <Text
+        style={[
+          styles.navTexto,
+          itemAtivo === "feed" && styles.navTextoAtivo,
+        ]}
       >
-        <FontAwesomeIcon
-          icon={faHouse}
-          size={22}
-          color={itemAtivo === "feed" ? "#00FFD1" : "#888"}
-        />
-        <Text
-          style={[
-            styles.navTexto,
-            itemAtivo === "feed" && styles.navTextoAtivo,
-          ]}
-        >
-          Feed
-        </Text>
-      </TouchableOpacity>
+        Feed
+      </Text>
+    </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.navCentro}
-        onPress={() => router.push("/CriarEventoScreen")}
-      >
-        <View style={styles.navCentroBotao}>
-          <FontAwesomeIcon icon={faPlus} size={22} color="#000" />
-        </View>
-        <Text style={styles.navTextoCentro}>Novo Evento</Text>
-      </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.navCentro}
+      onPress={onNovoEvento ?? (() => router.push("/CriarEventoScreen"))}
+    >
+      <View style={styles.navCentroBotao}>
+        <FontAwesomeIcon icon={faPlus} size={22} color="#000" />
+      </View>
+      <Text style={styles.navTextoCentro}>Novo Evento</Text>
+    </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => router.push("/grupos")}
+    <TouchableOpacity
+      style={styles.navItem}
+      onPress={() => router.push("/grupos")}
+    >
+      <FontAwesomeIcon
+        icon={faUsers}
+        size={22}
+        color={itemAtivo === "grupos" ? "#00FFD1" : "#888"}
+      />
+      <Text
+        style={[
+          styles.navTexto,
+          itemAtivo === "grupos" && styles.navTextoAtivo,
+        ]}
       >
-        <FontAwesomeIcon
-          icon={faUsers}
-          size={22}
-          color={itemAtivo === "grupos" ? "#00FFD1" : "#888"}
-        />
-        <Text
-          style={[
-            styles.navTexto,
-            itemAtivo === "grupos" && styles.navTextoAtivo,
-          ]}
-        >
-          Grupos
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+        Grupos
+      </Text>
+    </TouchableOpacity>
+  </View>
+);
+
+export default Navbar;
 
 const styles = StyleSheet.create({
   navbar: {
