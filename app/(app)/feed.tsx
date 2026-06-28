@@ -6,7 +6,7 @@ import styles from "@/src/styles/feed.styles";
 import { mapEvento, iniciaisDoNome } from "@/src/components/helpers";
 import type { Evento } from "@/src/types";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { getFeedEventos } from "@/src/api/eventos";
+import { getFeedEventos, getContagemParticipantes } from "@/src/api/eventos";
 
 import FeedHeader from "@/src/components/FeedHeader";
 import FeedFiltros from "@/src/components/FeedFiltros";
@@ -46,7 +46,14 @@ const Feed = () => {
     if (error) {
       console.error("Erro ao carregar eventos:", error);
     } else {
-      setEventos((data ?? []).map(mapEvento));
+      const eventosMapeados = (data ?? []).map(mapEvento);
+      const ids = eventosMapeados.map((e) => e.id);
+      const contagem = await getContagemParticipantes(ids);
+      const eventosComContagem = eventosMapeados.map((e) => ({
+        ...e,
+        participantesCount: contagem[e.id] ?? 0,
+      }));
+      setEventos(eventosComContagem);
       setFiltroAtivo("Todos");
     }
 

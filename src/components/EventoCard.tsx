@@ -36,15 +36,9 @@ const EventoCard = ({ evento, onPress }: Props) => (
 
     <View style={styles.cardRodape}>
       <View style={styles.participantes}>
-        {evento.participantes.map((p, i) => (
-          <View
-            key={i}
-            style={[styles.miniAvatar, { marginLeft: i === 0 ? 0 : -8 }]}
-          >
-            <Text style={styles.miniAvatarTexto}>{p}</Text>
-          </View>
-        ))}
-        <Text style={styles.totalParticipantes}>+{evento.total}</Text>
+        <Text style={styles.totalParticipantes}>
+          {evento.participantesCount}/{evento.total} participantes
+        </Text>
       </View>
       <TouchableOpacity style={styles.botaoVer} onPress={() => onPress(evento)}>
         <Text style={styles.botaoVerTexto}>Ver</Text>

@@ -1,5 +1,6 @@
 import { supabase } from "@/utils/supabase";
-import type { EventoSupabase, EventoForm } from "@/src/types";
+import type { EventoSupabase, EventoForm, ParticipanteDisplay } from "@/src/types";
+import { iniciaisDoNome, gerarCorAvatar } from "@/src/components/helpers";
 
 const TABELA = "eventos";
 
@@ -63,6 +64,86 @@ export const getMeusEventosPaginados = async (
 
   if (error) return { data: undefined, error: error.message };
   return { data: (data ?? []) as EventoSupabase[], error: undefined };
+};
+
+export const getIsParticipante = async (eventoId: string, userId: string): Promise<boolean> => {
+  const { data } = await supabase
+    .from("participantes_evento")
+    .select("user_id")
+    .eq("evento_id", eventoId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  return !!data;
+};
+
+export const postParticiparEvento = async (eventoId: string, userId: string): ApiResult<null> => {
+  const { error } = await supabase
+    .from("participantes_evento")
+    .insert({ evento_id: eventoId, user_id: userId });
+  if (error) return { data: undefined, error: error.message };
+  return { data: null, error: undefined };
+};
+
+export const deleteCancelarParticipacao = async (eventoId: string, userId: string): ApiResult<null> => {
+  const { error } = await supabase
+    .from("participantes_evento")
+    .delete()
+    .eq("evento_id", eventoId)
+    .eq("user_id", userId);
+  if (error) return { data: undefined, error: error.message };
+  return { data: null, error: undefined };
+};
+
+export const getContagemParticipantes = async (
+  eventoIds: string[],
+): Promise<Record<string, number>> => {
+  if (eventoIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from("participantes_evento")
+    .select("evento_id")
+    .in("evento_id", eventoIds);
+
+  if (error) return {};
+
+  const contagem: Record<string, number> = {};
+  for (const row of data ?? []) {
+    contagem[row.evento_id] = (contagem[row.evento_id] ?? 0) + 1;
+  }
+  return contagem;
+};
+
+export const getParticipantesEvento = async (eventoId: string): ApiResult<ParticipanteDisplay[]> => {
+  const { data, error } = await supabase
+    .from("participantes_evento")
+    .select("user_id")
+    .eq("evento_id", eventoId)
+    .order("criado_em", { ascending: true });
+
+  if (error) return { data: undefined, error: error.message };
+
+  const userIds = (data ?? []).map((p: any) => p.user_id as string);
+
+  // tenta buscar nomes da tabela profiles (pode não existir)
+  let nomesPorId: Record<string, string> = {};
+  const { data: perfis } = await supabase
+    .from("profiles")
+    .select("id, nome")
+    .in("id", userIds);
+  if (perfis) {
+    for (const p of perfis) nomesPorId[p.id] = p.nome ?? "Participante";
+  }
+
+  const participantes: ParticipanteDisplay[] = userIds.map((uid) => {
+    const nome = nomesPorId[uid] ?? "Participante";
+    return {
+      userId: uid,
+      nome,
+      iniciais: iniciaisDoNome(nome),
+      corAvatar: gerarCorAvatar(uid),
+    };
+  });
+
+  return { data: participantes, error: undefined };
 };
 
 export const countMeusEventos = async (userId: string): ApiResult<number> => {

@@ -155,7 +155,7 @@ const Groups = () => {
 export default Groups;
 
 const estilos = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0D0D0D", paddingTop: 40 },
+  container: { flex: 1, backgroundColor: "#0D0D0D", paddingTop: 40, overflow: "hidden" },
   cabecalho: {
     flexDirection: "row",
     justifyContent: "space-between",

@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0D0D0D",
     paddingTop: 60,
     paddingHorizontal: 20,
+    overflow: "hidden",
   },
   cabecalho: {
     flexDirection: "row",

@@ -24,6 +24,14 @@ export type EventoSupabase = {
   criado_por: string | null;
   vagas: number | null;
   grupos: { nome: string } | null;
+  participantes_evento?: { count: number }[];
+};
+
+export type ParticipanteDisplay = {
+  userId: string;
+  nome: string;
+  iniciais: string;
+  corAvatar: string;
 };
 
 export type GrupoSupabase = {
@@ -51,6 +59,7 @@ export type Evento = {
   participantes: string[];
   coresAvatar: string[];
   total: number;
+  participantesCount: number;
   grupo: string;
   criador: { iniciais: string; nome: string; corAvatar: string };
   criadorId: string;

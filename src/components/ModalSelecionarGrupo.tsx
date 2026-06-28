@@ -22,7 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { corDoEsporte, iconeDoEsporte, emojiDoEsporte } from "./helpers";
 import type { Grupo } from "@/src/types";
-import { getMeusGrupos } from "@/src/api/grupos";
+import { getMeusGrupos, getGruposParticipando } from "@/src/api/grupos";
 import { useAuth } from "@/src/contexts/AuthContext";
 
 type Props = {
@@ -59,9 +59,13 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const carregarGrupos = async () => {
     if (!user) return;
     setCarregando(true);
-    const { data, error } = await getMeusGrupos(user.id);
-    if (error) console.error("Erro ao carregar grupos:", error);
-    else setGrupos((data ?? []) as Grupo[]);
+    const [criados, participando] = await Promise.all([
+      getMeusGrupos(user.id),
+      getGruposParticipando(user.id),
+    ]);
+    const todos = [...(criados.data ?? []), ...(participando.data ?? [])];
+    const unicos = todos.filter((g, i, arr) => arr.findIndex((x) => x.id === g.id) === i);
+    setGrupos(unicos as Grupo[]);
     setCarregando(false);
   };
 

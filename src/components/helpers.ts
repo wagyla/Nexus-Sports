@@ -56,6 +56,17 @@ export const ICONE_ESPORTE: Record<string, IconDefinition> = {
 export const corDoEsporte = (esporte: string): string =>
   COR_ESPORTE[esporte?.toLowerCase()] ?? "#8855FF";
 
+const CORES_AVATAR = [
+  "#6c63ff", "#ff6584", "#43b89c", "#f7b731", "#e84393",
+  "#00adb5", "#ff5722", "#3f51b5", "#009688", "#9c27b0",
+];
+
+export const gerarCorAvatar = (seed: string): string => {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+  return CORES_AVATAR[Math.abs(hash) % CORES_AVATAR.length];
+};
+
 export const emojiDoEsporte = (esporte: string): string =>
   EMOJI_ESPORTE[esporte?.toLowerCase()] ?? "🏅";
 
@@ -85,6 +96,7 @@ export const formatarDataCompleta = (dataISO: string): string => {
 export const mapEvento = (e: EventoSupabase): Evento => {
   const dataISO = e.data_hora?.split("T")[0] ?? "";
   const hora = e.data_hora?.split("T")[1]?.slice(0, 5) ?? "00:00";
+  const participantesCount = e.participantes_evento?.[0]?.count ?? 0;
 
   return {
     id: String(e.id),
@@ -98,6 +110,7 @@ export const mapEvento = (e: EventoSupabase): Evento => {
     participantes: [],
     coresAvatar: [],
     total: e.vagas ?? 0,
+    participantesCount,
     grupo: e.grupos?.nome ?? "",
     criador: {
       iniciais: "",

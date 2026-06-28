@@ -8,15 +8,22 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faXmark, faPen, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faPen, faCalendarDays, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import WheelTimePicker from "@/src/components/WheelTimePicker";
 import { formatarDataCompleta, hojeISO } from "./helpers";
 import { useAuth } from "@/src/contexts/AuthContext";
-import type { Evento } from "@/src/types";
+import {
+  getParticipantesEvento,
+  getIsParticipante,
+  postParticiparEvento,
+  deleteCancelarParticipacao,
+} from "@/src/api/eventos";
+import type { Evento, ParticipanteDisplay } from "@/src/types";
 
 type Props = {
   evento?: Evento;
@@ -30,6 +37,12 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
   const slideAnim = useRef(new Animated.Value(600)).current;
   const [modoEdicao, setModoEdicao] = useState(false);
   const [calendarioVisivel, setCalendarioVisivel] = useState(false);
+  const [listaParticipantesVisivel, setListaParticipantesVisivel] = useState(false);
+  const [participantes, setParticipantes] = useState<ParticipanteDisplay[]>([]);
+  const [carregandoParticipantes, setCarregandoParticipantes] = useState(false);
+  const [isParticipante, setIsParticipante] = useState(false);
+  const [inscrevendo, setInscrevendo] = useState(false);
+  const [erroParticipacao, setErroParticipacao] = useState<string | undefined>();
   const [form, setForm] = useState({
     nome: "",
     dataISO: "",
@@ -47,6 +60,9 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
         tension: 65,
         friction: 11,
       }).start();
+      if (evento && user) {
+        getIsParticipante(evento.id, user.id).then(setIsParticipante);
+      }
     } else {
       Animated.timing(slideAnim, {
         toValue: 600,
@@ -55,6 +71,9 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
       }).start();
       setModoEdicao(false);
       setCalendarioVisivel(false);
+      setIsParticipante(false);
+      setErroParticipacao(undefined);
+      setParticipantes([]);
     }
   }, [visivel]);
 
@@ -74,7 +93,46 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
   if (!evento) return null;
 
   const isOrganizador = !!user && evento.criadorId === user.id;
-  const vagasRestantes = evento.total - evento.participantes.length;
+  const vagasRestantes = evento.total - evento.participantesCount;
+
+  const handleParticipar = async () => {
+    if (!user) return;
+    setInscrevendo(true);
+    setErroParticipacao(undefined);
+    const { error } = await postParticiparEvento(evento.id, user.id);
+    if (error) {
+      setErroParticipacao("Não foi possível participar. Tente novamente.");
+    } else {
+      setIsParticipante(true);
+      onSalvar(evento.id, { participantesCount: evento.participantesCount + 1 });
+      setParticipantes([]);
+    }
+    setInscrevendo(false);
+  };
+
+  const handleCancelarParticipacao = async () => {
+    if (!user) return;
+    setInscrevendo(true);
+    setErroParticipacao(undefined);
+    const { error } = await deleteCancelarParticipacao(evento.id, user.id);
+    if (error) {
+      setErroParticipacao("Não foi possível cancelar. Tente novamente.");
+    } else {
+      setIsParticipante(false);
+      onSalvar(evento.id, { participantesCount: Math.max(0, evento.participantesCount - 1) });
+      setParticipantes([]);
+    }
+    setInscrevendo(false);
+  };
+
+  const abrirListaParticipantes = async () => {
+    setListaParticipantesVisivel(true);
+    if (participantes.length > 0) return;
+    setCarregandoParticipantes(true);
+    const { data } = await getParticipantesEvento(evento.id);
+    setParticipantes(data ?? []);
+    setCarregandoParticipantes(false);
+  };
 
   const handleSalvar = () => {
     onSalvar(evento.id, form);
@@ -290,26 +348,71 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 <Text style={estilos.descricao}>{evento.descricao}</Text>
               )}
 
-              <Text style={[estilos.rotulo, { marginTop: 20 }]}>
-                PARTICIPANTES ({evento.participantes.length}/{evento.total})
-              </Text>
+              <TouchableOpacity
+                onPress={abrirListaParticipantes}
+                style={estilos.participantesHeader}
+              >
+                <Text style={[estilos.rotulo, { marginTop: 20, marginBottom: 0 }]}>
+                  PARTICIPANTES ({evento.participantesCount}/{evento.total})
+                </Text>
+                <FontAwesomeIcon icon={faChevronRight} size={11} color="#555" style={{ marginTop: 20 }} />
+              </TouchableOpacity>
               <View style={estilos.participantesRow}>
-                {evento.participantes.map((p, i) => (
-                  <View
-                    key={i}
-                    style={[
-                      estilos.miniAvatar,
-                      { backgroundColor: evento.coresAvatar[i], marginLeft: i === 0 ? 0 : -8 },
-                    ]}
-                  >
-                    <Text style={estilos.miniAvatarTexto}>{p}</Text>
-                  </View>
-                ))}
                 <Text style={estilos.vagasTexto}>
-                  +{vagasRestantes} vaga{vagasRestantes !== 1 ? "s" : ""}{" "}
-                  restante{vagasRestantes !== 1 ? "s" : ""}
+                  {vagasRestantes > 0
+                    ? `${vagasRestantes} vaga${vagasRestantes !== 1 ? "s" : ""} restante${vagasRestantes !== 1 ? "s" : ""}`
+                    : "Evento lotado"}
                 </Text>
               </View>
+
+              <Modal
+                transparent
+                visible={listaParticipantesVisivel}
+                animationType="slide"
+                onRequestClose={() => setListaParticipantesVisivel(false)}
+              >
+                <Pressable
+                  style={estilos.overlay}
+                  onPress={() => setListaParticipantesVisivel(false)}
+                >
+                  <Pressable onPress={() => {}}>
+                    <View style={estilos.listaSheet}>
+                      <View style={estilos.handle} />
+                      <View style={estilos.listaHeader}>
+                        <Text style={estilos.listaTitulo}>
+                          Participantes ({evento.participantesCount})
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => setListaParticipantesVisivel(false)}
+                          style={estilos.botaoFechar}
+                        >
+                          <FontAwesomeIcon icon={faXmark} size={14} color="#888" />
+                        </TouchableOpacity>
+                      </View>
+                      {carregandoParticipantes ? (
+                        <ActivityIndicator color="#00FFD1" style={{ marginTop: 24 }} />
+                      ) : participantes.length === 0 ? (
+                        <Text style={estilos.semParticipantes}>Nenhum participante ainda.</Text>
+                      ) : (
+                        <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
+                          {participantes.map((p) => (
+                            <View key={p.userId} style={estilos.participanteItem}>
+                              <View style={[estilos.avatarCriador, { backgroundColor: p.corAvatar }]}>
+                                <Text style={estilos.avatarCriadorTexto}>{p.iniciais}</Text>
+                              </View>
+                              <Text style={estilos.participanteNome}>{p.nome}</Text>
+                            </View>
+                          ))}
+                        </ScrollView>
+                      )}
+                    </View>
+                  </Pressable>
+                </Pressable>
+              </Modal>
+
+              {erroParticipacao && (
+                <Text style={estilos.erroTexto}>{erroParticipacao}</Text>
+              )}
 
               {modoEdicao ? (
                 <TouchableOpacity style={estilos.botaoSalvar} onPress={handleSalvar}>
@@ -319,9 +422,32 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 <TouchableOpacity style={estilos.botaoEditar} onPress={() => setModoEdicao(true)}>
                   <Text style={estilos.botaoEditarTexto}>Editar Evento</Text>
                 </TouchableOpacity>
+              ) : isParticipante ? (
+                <>
+                  <View style={estilos.bannerInscrito}>
+                    <Text style={estilos.bannerInscritoTexto}>
+                      ✓ Você está inscrito neste evento
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={estilos.botaoCancelarParticipacao}
+                    onPress={handleCancelarParticipacao}
+                    disabled={inscrevendo}
+                  >
+                    <Text style={estilos.botaoCancelarParticipacaoTexto}>
+                      {inscrevendo ? "Cancelando..." : "Cancelar Participação"}
+                    </Text>
+                  </TouchableOpacity>
+                </>
               ) : (
-                <TouchableOpacity style={estilos.botaoParticipar} onPress={onFechar}>
-                  <Text style={estilos.botaoParticiparTexto}>Participar do Evento</Text>
+                <TouchableOpacity
+                  style={[estilos.botaoParticipar, inscrevendo && { opacity: 0.6 }]}
+                  onPress={handleParticipar}
+                  disabled={inscrevendo}
+                >
+                  <Text style={estilos.botaoParticiparTexto}>
+                    {inscrevendo ? "Inscrevendo..." : "Participar do Evento"}
+                  </Text>
                 </TouchableOpacity>
               )}
             </ScrollView>
@@ -573,5 +699,84 @@ const estilos = StyleSheet.create({
     paddingVertical: 14,
     borderTopWidth: 1,
     borderTopColor: "#2a2a2a",
+  },
+  participantesHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  listaSheet: {
+    backgroundColor: "#111",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: 36,
+  },
+  listaHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  listaTitulo: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  semParticipantes: {
+    color: "#555",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  participanteItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1a1a1a",
+  },
+  participanteNome: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  bannerInscrito: {
+    backgroundColor: "#00FFD122",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginTop: 24,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#00FFD144",
+    alignItems: "center",
+  },
+  bannerInscritoTexto: {
+    color: "#00FFD1",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  botaoCancelarParticipacao: {
+    backgroundColor: "#1a1a2e",
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ff444466",
+  },
+  botaoCancelarParticipacaoTexto: {
+    color: "#ff4444",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  erroTexto: {
+    color: "#ff4444",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 16,
   },
 });

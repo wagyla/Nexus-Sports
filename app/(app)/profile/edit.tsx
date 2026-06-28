@@ -174,6 +174,7 @@ const estilos = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#0D0D0D",
+    overflow: "hidden",
   },
   scroll: {
     paddingHorizontal: 37,

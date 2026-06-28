@@ -143,7 +143,7 @@ const NewGroup = () => {
 export default NewGroup;
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#000" },
+  safe: { flex: 1, backgroundColor: "#000", overflow: "hidden" },
   scroll: { padding: 24, paddingTop: 40, paddingBottom: 40 },
   header: {
     flexDirection: "row",
