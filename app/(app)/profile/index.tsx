@@ -13,6 +13,7 @@ import Navbar from "@/src/components/Navbar";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
 import ModalEventosPerfil from "@/src/components/ModalEventosPerfil";
 import ModalGruposPerfil from "@/src/components/ModalGruposPerfil";
+import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
 
 import { useAuth } from "@/src/contexts/AuthContext";
 import { supabase } from "@/utils/supabase";
@@ -52,6 +53,7 @@ const Profile = () => {
   const [grupos, setGrupos] = useState<GrupoPerfil[]>([]);
   const [modalEventosVisivel, setModalEventosVisivel] = useState(false);
   const [modalGruposVisivel, setModalGruposVisivel] = useState(false);
+  const [modalSelecionarGrupoVisivel, setModalSelecionarGrupoVisivel] = useState(false);
 
   const nome: string = user?.user_metadata?.nome ?? "";
   const cidade: string = user?.user_metadata?.cidade ?? "";
@@ -219,7 +221,10 @@ const Profile = () => {
         )}
       </ScrollView>
 
-      <Navbar itemAtivo="perfil" />
+      <Navbar
+        itemAtivo="perfil"
+        onNovoEvento={() => setModalSelecionarGrupoVisivel(true)}
+      />
 
       <ModalEventosPerfil
         visivel={modalEventosVisivel}
@@ -230,6 +235,10 @@ const Profile = () => {
         visivel={modalGruposVisivel}
         onFechar={() => setModalGruposVisivel(false)}
         grupos={grupos}
+      />
+      <ModalSelecionarGrupo
+        visivel={modalSelecionarGrupoVisivel}
+        onFechar={() => setModalSelecionarGrupoVisivel(false)}
       />
     </View>
   );

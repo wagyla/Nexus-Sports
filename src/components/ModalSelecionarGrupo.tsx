@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "@/utils/supabase";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faXmark,
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
+  const { user } = useAuth();
   const slideAnim = useRef(new Animated.Value(700)).current;
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [busca, setBusca] = useState("");
@@ -56,9 +58,13 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   }, [visivel]);
 
   const carregarGrupos = async () => {
+    if (!user) return;
     setCarregando(true);
 
-    const { data, error } = await supabase.from(SupabaseTablesEnum.GRUPOS).select("*");
+    const { data, error } = await supabase
+      .from(SupabaseTablesEnum.GRUPOS)
+      .select("*")
+      .eq("criador_id", user.id);
     if (!error && data) {
       setGrupos(data as Grupo[]);
     }
