@@ -23,8 +23,10 @@ const GrupoCard = ({ grupo, tipo, onPress }: Props) => (
           : grupo.esporte}
       </Text>
       {tipo === "meu" && (
-        <View style={estilos.badge}>
-          <Text style={estilos.badgeTexto}>Admin</Text>
+        <View style={[estilos.badge, !grupo.isAdmin && estilos.badgeParticipante]}>
+          <Text style={[estilos.badgeTexto, !grupo.isAdmin && estilos.badgeParticipanteTexto]}>
+            {grupo.isAdmin ? "Admin" : "Participante"}
+          </Text>
         </View>
       )}
     </View>
@@ -71,6 +73,10 @@ const estilos = StyleSheet.create({
     marginTop: 6,
   },
   badgeTexto: { color: "#00FFD1", fontSize: 12, fontWeight: "600" },
+  badgeParticipante: {
+    backgroundColor: "#1a1a4a",
+  },
+  badgeParticipanteTexto: { color: "#7a7aff" },
   botaoVer: {
     borderWidth: 1,
     borderColor: "#555",

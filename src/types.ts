@@ -33,8 +33,10 @@ export type GrupoSupabase = {
   esporte?: string;
   cidade?: string;
   privado?: boolean;
-  criador_id?: string;
+  criado_por?: string;
   criado_em?: string;
+  membros_grupos?: { count: number }[];
+  eventos?: { count: number }[];
 };
 
 export type Evento = {

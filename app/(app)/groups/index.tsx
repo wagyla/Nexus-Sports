@@ -14,7 +14,7 @@ import GrupoCard from "@/src/components/GrupoCard";
 import ModalGrupo from "@/src/components/ModalGrupo";
 import type { GrupoSupabase, GrupoDisplay } from "@/src/types";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { getMeusGrupos, getGruposPublicos } from "@/src/api/grupos";
+import { getMeusGrupos, getGruposPublicos, getGruposParticipando } from "@/src/api/grupos";
 
 const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
   id: g.id,
@@ -22,8 +22,8 @@ const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
   esporte: g.esporte ?? "Geral",
   local: g.cidade ?? "-",
   descricao: g.descricao ?? "",
-  membros: 0,
-  eventos: 0,
+  membros: g.membros_grupos?.[0]?.count ?? 0,
+  eventos: g.eventos?.[0]?.count ?? 0,
   isAdmin,
   participantes: [],
   coresAvatar: [],
@@ -43,18 +43,36 @@ const Groups = () => {
     setCarregando(true);
 
     const [
-      { data: meus, error: erroMeus },
+      { data: criados, error: erroCriados },
+      { data: participando, error: erroParticipando },
       { data: publicos, error: erroPublicos },
     ] = await Promise.all([
       getMeusGrupos(user.id),
+      getGruposParticipando(user.id),
       getGruposPublicos(),
     ]);
 
-    if (erroMeus) console.error("Erro nos meus grupos:", erroMeus);
+    if (erroCriados) console.error("Erro nos meus grupos:", erroCriados);
+    if (erroParticipando) console.error("Erro nos grupos participando:", erroParticipando);
     if (erroPublicos) console.error("Erro nos grupos públicos:", erroPublicos);
 
-    setMeusGrupos((meus ?? []).map((g: GrupoSupabase) => mapGrupo(g, true)));
-    setGruposPublicos((publicos ?? []).map((g: GrupoSupabase) => mapGrupo(g, false)));
+    const criadosIds = new Set((criados ?? []).map((g) => g.id));
+    const participandoSemDuplicatas = (participando ?? []).filter((g) => !criadosIds.has(g.id));
+
+    const meusIds = new Set([
+      ...(criados ?? []).map((g) => g.id),
+      ...(participando ?? []).map((g) => g.id),
+    ]);
+
+    setMeusGrupos([
+      ...(criados ?? []).map((g: GrupoSupabase) => mapGrupo(g, true)),
+      ...participandoSemDuplicatas.map((g: GrupoSupabase) => mapGrupo(g, false)),
+    ]);
+    setGruposPublicos(
+      (publicos ?? [])
+        .filter((g) => !meusIds.has(g.id))
+        .map((g: GrupoSupabase) => mapGrupo(g, false))
+    );
 
     setCarregando(false);
   };
@@ -128,6 +146,7 @@ const Groups = () => {
         isMembro={isMembro}
         onFechar={() => setModalVisivel(false)}
         onDeletado={carregarGrupos}
+        onEntrou={carregarGrupos}
       />
     </View>
   );

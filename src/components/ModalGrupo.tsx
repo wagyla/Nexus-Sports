@@ -7,13 +7,12 @@ import {
   Modal,
   Animated,
   Pressable,
-  Alert,
   StyleSheet,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { deleteGrupo } from "@/src/api/grupos";
+import { deleteGrupo, postEntrarGrupo, deleteSairDoGrupo } from "@/src/api/grupos";
 import type { GrupoDisplay } from "@/src/types";
 
 type Props = {
@@ -22,6 +21,7 @@ type Props = {
   isMembro: boolean;
   onFechar: () => void;
   onDeletado?: () => void;
+  onEntrou?: () => void;
 };
 
 const InfoLinha = ({ rotulo, valor }: { rotulo: string; valor: string }) => (
@@ -31,10 +31,18 @@ const InfoLinha = ({ rotulo, valor }: { rotulo: string; valor: string }) => (
   </>
 );
 
-const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado }: Props) => {
+const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado, onEntrou }: Props) => {
   const slideAnim = useRef(new Animated.Value(600)).current;
   const { user } = useAuth();
   const [excluindo, setExcluindo] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
+  const [erro, setErro] = useState<string | undefined>(undefined);
+  const [entrando, setEntrando] = useState(false);
+  const [entrou, setEntrou] = useState(false);
+  const [erroEntrada, setErroEntrada] = useState<string | undefined>(undefined);
+  const [confirmandoSaida, setConfirmandoSaida] = useState(false);
+  const [saindo, setSaindo] = useState(false);
+  const [erroSaida, setErroSaida] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (visivel) {
@@ -50,45 +58,57 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado }: Props) =
         duration: 250,
         useNativeDriver: true,
       }).start();
+      setConfirmando(false);
+      setErro(undefined);
+      setEntrou(false);
+      setErroEntrada(undefined);
+      setConfirmandoSaida(false);
+      setErroSaida(undefined);
     }
   }, [visivel]);
 
   if (!grupo) return null;
 
-  const handleExcluir = () => {
-    Alert.alert(
-      "Excluir grupo",
-      `Tem certeza que deseja excluir "${grupo.nome}"? Esta ação não pode ser desfeita.`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            if (!user) return;
-            setExcluindo(true);
-            const { error } = await deleteGrupo(grupo.id, user.id);
-            setExcluindo(false);
-            if (error) {
-              Alert.alert("Erro", "Não foi possível excluir o grupo.");
-              return;
-            }
-            onFechar();
-            onDeletado?.();
-          },
-        },
-      ]
-    );
+  const confirmarSaida = async () => {
+    if (!user) return;
+    setSaindo(true);
+    setErroSaida(undefined);
+    const { error } = await deleteSairDoGrupo(grupo.id, user.id);
+    setSaindo(false);
+    if (error) {
+      setErroSaida("Não foi possível sair do grupo. Tente novamente.");
+      return;
+    }
+    onFechar();
+    onDeletado?.();
   };
 
-  const onSair = () => {
-    onFechar();
-    Alert.alert("Saiu do grupo", `Você saiu de "${grupo.nome}".`);
+  const handleEntrar = async () => {
+    if (!user) return;
+    setEntrando(true);
+    setErroEntrada(undefined);
+    const { error } = await postEntrarGrupo(grupo.id, user.id);
+    setEntrando(false);
+    if (error) {
+      setErroEntrada("Não foi possível entrar no grupo. Tente novamente.");
+      return;
+    }
+    setEntrou(true);
+    onEntrou?.();
   };
 
-  const onEntrar = () => {
+  const confirmarExclusao = async () => {
+    if (!user) return;
+    setExcluindo(true);
+    setErro(undefined);
+    const { error } = await deleteGrupo(grupo.id, user.id);
+    setExcluindo(false);
+    if (error) {
+      setErro("Não foi possível excluir o grupo. Tente novamente.");
+      return;
+    }
     onFechar();
-    Alert.alert("Solicitação enviada", `Você pediu para entrar em "${grupo.nome}".`);
+    onDeletado?.();
   };
 
   return (
@@ -148,24 +168,93 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado }: Props) =
               )}
 
               {grupo.isAdmin ? (
-                <TouchableOpacity
-                  style={estilos.botaoExcluir}
-                  onPress={handleExcluir}
-                  disabled={excluindo}
-                  activeOpacity={0.7}
-                >
-                  <Text style={estilos.botaoExcluirTexto}>
-                    {excluindo ? "Excluindo..." : "Excluir Grupo"}
-                  </Text>
-                </TouchableOpacity>
+                confirmando ? (
+                  <View style={estilos.confirmacaoContainer}>
+                    <Text style={estilos.confirmacaoTexto}>
+                      Excluir "{grupo.nome}"? Esta ação remove o grupo e todos os seus eventos e não pode ser desfeita.
+                    </Text>
+                    {erro && <Text style={estilos.erroTexto}>{erro}</Text>}
+                    <TouchableOpacity
+                      style={estilos.botaoConfirmar}
+                      onPress={confirmarExclusao}
+                      disabled={excluindo}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={estilos.botaoConfirmarTexto}>
+                        {excluindo ? "Excluindo..." : "Confirmar exclusão"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={estilos.botaoCancelarConfirmacao}
+                      onPress={() => { setConfirmando(false); setErro(undefined); }}
+                      disabled={excluindo}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={estilos.botaoCancelarConfirmacaoTexto}>Cancelar</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={estilos.botaoExcluir}
+                    onPress={() => setConfirmando(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={estilos.botaoExcluirTexto}>Excluir Grupo</Text>
+                  </TouchableOpacity>
+                )
               ) : isMembro ? (
-                <TouchableOpacity style={estilos.botaoSair} onPress={onSair}>
-                  <Text style={estilos.botaoSairTexto}>Sair do Grupo</Text>
-                </TouchableOpacity>
+                confirmandoSaida ? (
+                  <View style={estilos.confirmacaoSaidaContainer}>
+                    <Text style={estilos.confirmacaoTexto}>
+                      Sair de "{grupo.nome}"? Você poderá entrar novamente depois.
+                    </Text>
+                    {erroSaida && <Text style={estilos.erroTexto}>{erroSaida}</Text>}
+                    <TouchableOpacity
+                      style={estilos.botaoConfirmarSaida}
+                      onPress={confirmarSaida}
+                      disabled={saindo}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={estilos.botaoSairTexto}>
+                        {saindo ? "Saindo..." : "Confirmar saída"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={estilos.botaoCancelarConfirmacao}
+                      onPress={() => { setConfirmandoSaida(false); setErroSaida(undefined); }}
+                      disabled={saindo}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={estilos.botaoCancelarConfirmacaoTexto}>Cancelar</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={estilos.botaoSair}
+                    onPress={() => setConfirmandoSaida(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={estilos.botaoSairTexto}>Sair do Grupo</Text>
+                  </TouchableOpacity>
+                )
+              ) : entrou ? (
+                <View style={estilos.sucessoContainer}>
+                  <Text style={estilos.sucessoTexto}>Você entrou em "{grupo.nome}"!</Text>
+                </View>
               ) : (
-                <TouchableOpacity style={estilos.botaoEntrar} onPress={onEntrar}>
-                  <Text style={estilos.botaoEntrarTexto}>Entrar no Grupo</Text>
-                </TouchableOpacity>
+                <View style={{ marginTop: 24 }}>
+                  {erroEntrada && <Text style={estilos.erroEntradaTexto}>{erroEntrada}</Text>}
+                  <TouchableOpacity
+                    style={[estilos.botaoEntrar, entrando && { opacity: 0.6 }]}
+                    onPress={handleEntrar}
+                    disabled={entrando}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={estilos.botaoEntrarTexto}>
+                      {entrando ? "Entrando..." : "Entrar no Grupo"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </ScrollView>
           </Pressable>
@@ -262,4 +351,70 @@ const estilos = StyleSheet.create({
     borderColor: "#FF4444",
   },
   botaoExcluirTexto: { color: "#FF4444", fontSize: 16, fontWeight: "600" },
+  confirmacaoSaidaContainer: {
+    marginTop: 24,
+    backgroundColor: "#0a0a1a",
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#444",
+    gap: 10,
+  },
+  botaoConfirmarSaida: {
+    backgroundColor: "#333",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#555",
+  },
+  confirmacaoContainer: {
+    marginTop: 24,
+    backgroundColor: "#1a0a0a",
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#FF4444",
+    gap: 10,
+  },
+  confirmacaoTexto: {
+    color: "#ccc",
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  erroTexto: {
+    color: "#FF4444",
+    fontSize: 12,
+  },
+  botaoConfirmar: {
+    backgroundColor: "#FF4444",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  botaoConfirmarTexto: { color: "#fff", fontSize: 15, fontWeight: "700" },
+  botaoCancelarConfirmacao: {
+    backgroundColor: "#222",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  botaoCancelarConfirmacaoTexto: { color: "#888", fontSize: 15, fontWeight: "600" },
+  sucessoContainer: {
+    marginTop: 24,
+    backgroundColor: "#00FFD115",
+    borderRadius: 14,
+    paddingVertical: 18,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#00FFD1",
+  },
+  sucessoTexto: { color: "#00FFD1", fontSize: 15, fontWeight: "600" },
+  erroEntradaTexto: {
+    color: "#FF4444",
+    fontSize: 12,
+    marginBottom: 8,
+    marginLeft: 2,
+  },
 });
