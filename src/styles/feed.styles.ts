@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   filtros: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 20,
+    paddingHorizontal: 2,
   },
   tag: {
     paddingHorizontal: 14,

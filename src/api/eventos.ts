@@ -116,25 +116,30 @@ export const getParticipantesEvento = async (eventoId: string): ApiResult<Partic
   const { data, error } = await supabase
     .from("participantes_evento")
     .select("user_id")
-    .eq("evento_id", eventoId)
-    .order("criado_em", { ascending: true });
+    .eq("evento_id", eventoId);
 
   if (error) return { data: undefined, error: error.message };
 
   const userIds = (data ?? []).map((p: any) => p.user_id as string);
+  if (userIds.length === 0) return { data: [], error: undefined };
 
-  // tenta buscar nomes da tabela profiles (pode não existir)
-  let nomesPorId: Record<string, string> = {};
-  const { data: perfis } = await supabase
-    .from("profiles")
-    .select("id, nome")
-    .in("id", userIds);
-  if (perfis) {
-    for (const p of perfis) nomesPorId[p.id] = p.nome ?? "Participante";
+  const nomesPorId: Record<string, string> = {};
+  const { data: rpc, error: rpcError } = await supabase.rpc("get_nomes_usuarios", {
+    user_ids: userIds,
+  });
+
+  if (rpcError) {
+    console.warn("[getParticipantesEvento] RPC get_nomes_usuarios falhou:", rpcError.message);
   }
 
-  const participantes: ParticipanteDisplay[] = userIds.map((uid) => {
-    const nome = nomesPorId[uid] ?? "Participante";
+  if (rpc) {
+    for (const u of rpc as { id: string; nome: string | null }[]) {
+      if (u.nome) nomesPorId[u.id] = u.nome;
+    }
+  }
+
+  const participantes: ParticipanteDisplay[] = userIds.map((uid, i) => {
+    const nome = nomesPorId[uid] ?? `Participante ${i + 1}`;
     return {
       userId: uid,
       nome,
@@ -144,6 +149,17 @@ export const getParticipantesEvento = async (eventoId: string): ApiResult<Partic
   });
 
   return { data: participantes, error: undefined };
+};
+
+export const getEventosDoGrupo = async (grupoId: string): ApiResult<EventoSupabase[]> => {
+  const { data, error } = await supabase
+    .from(TABELA)
+    .select("id, nome, esporte, data_hora")
+    .eq("grupo_id", grupoId)
+    .order("data_hora", { ascending: true });
+
+  if (error) return { data: undefined, error: error.message };
+  return { data: (data ?? []) as EventoSupabase[], error: undefined };
 };
 
 export const countMeusEventos = async (userId: string): ApiResult<number> => {

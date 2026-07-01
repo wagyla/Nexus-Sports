@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,9 +11,15 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faXmark, faPen, faCalendarDays, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faXmark,
+  faPen,
+  faCalendarDays,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import WheelTimePicker from "@/src/components/WheelTimePicker";
 import { formatarDataCompleta, hojeISO } from "./helpers";
 import { useAuth } from "@/src/contexts/AuthContext";
@@ -37,12 +43,15 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
   const slideAnim = useRef(new Animated.Value(600)).current;
   const [modoEdicao, setModoEdicao] = useState(false);
   const [calendarioVisivel, setCalendarioVisivel] = useState(false);
-  const [listaParticipantesVisivel, setListaParticipantesVisivel] = useState(false);
+  const [listaParticipantesVisivel, setListaParticipantesVisivel] =
+    useState(false);
   const [participantes, setParticipantes] = useState<ParticipanteDisplay[]>([]);
   const [carregandoParticipantes, setCarregandoParticipantes] = useState(false);
   const [isParticipante, setIsParticipante] = useState(false);
   const [inscrevendo, setInscrevendo] = useState(false);
-  const [erroParticipacao, setErroParticipacao] = useState<string | undefined>();
+  const [erroParticipacao, setErroParticipacao] = useState<
+    string | undefined
+  >();
   const [form, setForm] = useState({
     nome: "",
     dataISO: "",
@@ -60,9 +69,6 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
         tension: 65,
         friction: 11,
       }).start();
-      if (evento && user) {
-        getIsParticipante(evento.id, user.id).then(setIsParticipante);
-      }
     } else {
       Animated.timing(slideAnim, {
         toValue: 600,
@@ -75,7 +81,15 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
       setErroParticipacao(undefined);
       setParticipantes([]);
     }
-  }, [visivel]);
+  }, [visivel, slideAnim]);
+
+  const eventoId = evento?.id;
+  const userId = user?.id;
+  useEffect(() => {
+    if (visivel && eventoId && userId) {
+      getIsParticipante(eventoId, userId).then(setIsParticipante);
+    }
+  }, [visivel, eventoId, userId]);
 
   useEffect(() => {
     if (evento) {
@@ -104,7 +118,9 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
       setErroParticipacao("Não foi possível participar. Tente novamente.");
     } else {
       setIsParticipante(true);
-      onSalvar(evento.id, { participantesCount: evento.participantesCount + 1 });
+      onSalvar(evento.id, {
+        participantesCount: evento.participantesCount + 1,
+      });
       setParticipantes([]);
     }
     setInscrevendo(false);
@@ -119,7 +135,9 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
       setErroParticipacao("Não foi possível cancelar. Tente novamente.");
     } else {
       setIsParticipante(false);
-      onSalvar(evento.id, { participantesCount: Math.max(0, evento.participantesCount - 1) });
+      onSalvar(evento.id, {
+        participantesCount: Math.max(0, evento.participantesCount - 1),
+      });
       setParticipantes([]);
     }
     setInscrevendo(false);
@@ -169,7 +187,12 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
             <View style={estilos.handle} />
 
             <View style={estilos.cabecalhoModal}>
-              <View style={[estilos.tagEsporte, { backgroundColor: evento.cor + "33" }]}>
+              <View
+                style={[
+                  estilos.tagEsporte,
+                  { backgroundColor: evento.cor + "33" },
+                ]}
+              >
                 <Text style={[estilos.tagEsporteTexto, { color: evento.cor }]}>
                   {evento.esporte}
                 </Text>
@@ -178,7 +201,10 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 {isOrganizador && !modoEdicao && (
                   <TouchableOpacity
                     onPress={() => setModoEdicao(true)}
-                    style={[estilos.botaoFechar, { backgroundColor: "#1a1a2e", marginRight: 8 }]}
+                    style={[
+                      estilos.botaoFechar,
+                      { backgroundColor: "#1a1a2e", marginRight: 8 },
+                    ]}
                   >
                     <FontAwesomeIcon icon={faPen} size={13} color="#00FFD1" />
                   </TouchableOpacity>
@@ -215,20 +241,44 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
               <Text style={estilos.rotulo}>DATA E HORA</Text>
               {modoEdicao ? (
                 <>
-                  <Text style={[estilos.rotulo, { marginBottom: 6 }]}>DATA</Text>
+                  <Text style={[estilos.rotulo, { marginBottom: 6 }]}>
+                    DATA
+                  </Text>
                   <TouchableOpacity
-                    style={[estilos.input, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }]}
+                    style={[
+                      estilos.input,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 20,
+                      },
+                    ]}
                     onPress={() => setCalendarioVisivel(true)}
                   >
-                    <Text style={{ color: form.dataISO ? "#fff" : "#555", fontSize: 14 }}>
+                    <Text
+                      style={{
+                        color: form.dataISO ? "#fff" : "#555",
+                        fontSize: 14,
+                      }}
+                    >
                       {form.dataISO
-                        ? (() => { const [a, m, d] = form.dataISO.split("-"); return `${d}/${m}/${a}`; })()
+                        ? (() => {
+                            const [a, m, d] = form.dataISO.split("-");
+                            return `${d}/${m}/${a}`;
+                          })()
                         : "DD/MM/AAAA"}
                     </Text>
-                    <FontAwesomeIcon icon={faCalendarDays} size={16} color="#00FFD1" />
+                    <FontAwesomeIcon
+                      icon={faCalendarDays}
+                      size={16}
+                      color="#00FFD1"
+                    />
                   </TouchableOpacity>
 
-                  <Text style={[estilos.rotulo, { marginBottom: 0 }]}>HORÁRIO</Text>
+                  <Text style={[estilos.rotulo, { marginBottom: 0 }]}>
+                    HORÁRIO
+                  </Text>
                   <WheelTimePicker
                     value={form.hora}
                     onChange={(t) => setForm((f) => ({ ...f, hora: t }))}
@@ -252,7 +302,9 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 >
                   <Pressable onPress={() => {}}>
                     <View style={estilos.containerCalendario}>
-                      <Text style={estilos.tituloCalendario}>Selecione a data</Text>
+                      <Text style={estilos.tituloCalendario}>
+                        Selecione a data
+                      </Text>
                       <Calendar
                         current={form.dataISO || hojeISO}
                         minDate={hojeISO}
@@ -261,7 +313,10 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                           setCalendarioVisivel(false);
                         }}
                         markedDates={{
-                          [form.dataISO]: { selected: true, selectedColor: "#00FFD1" },
+                          [form.dataISO]: {
+                            selected: true,
+                            selectedColor: "#00FFD1",
+                          },
                         }}
                         theme={{
                           backgroundColor: "#1a1a1a",
@@ -286,20 +341,26 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                         style={estilos.botaoCancelarCalendario}
                         onPress={() => setCalendarioVisivel(false)}
                       >
-                        <Text style={{ color: "#888", fontWeight: "600" }}>Cancelar</Text>
+                        <Text style={{ color: "#888", fontWeight: "600" }}>
+                          Cancelar
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </Pressable>
                 </Pressable>
               </Modal>
 
-              <Text style={[estilos.rotulo, { marginTop: 20 }]}>LOCALIZAÇÃO</Text>
+              <Text style={[estilos.rotulo, { marginTop: 20 }]}>
+                LOCALIZAÇÃO
+              </Text>
               {modoEdicao ? (
                 <>
                   <TextInput
                     style={[estilos.input, { marginBottom: 8 }]}
                     value={form.endereco}
-                    onChangeText={(v) => setForm((f) => ({ ...f, endereco: v }))}
+                    onChangeText={(v) =>
+                      setForm((f) => ({ ...f, endereco: v }))
+                    }
                     placeholder="Endereço"
                     placeholderTextColor="#555"
                   />
@@ -318,17 +379,16 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 </>
               )}
 
-              <Text style={[estilos.rotulo, { marginTop: 20 }]}>GRUPO</Text>
-              <Text style={[estilos.valor, { color: "#00FFD1" }]}>{evento.grupo}</Text>
-
-              <Text style={[estilos.rotulo, { marginTop: 20 }]}>CRIADO POR</Text>
+              <Text style={[estilos.rotulo, { marginTop: 20 }]}>
+                ORGANIZADO POR
+              </Text>
               <View style={estilos.criadorRow}>
-                <View style={[estilos.avatarCriador, { backgroundColor: evento.criador.corAvatar }]}>
-                  <Text style={estilos.avatarCriadorTexto}>{evento.criador.iniciais}</Text>
+                <View style={[estilos.avatarCriador, { backgroundColor: "#00FFD122" }]}>
+                  <MaterialCommunityIcons name="account-group" size={18} color="#00FFD1" />
                 </View>
                 <View>
-                  <Text style={estilos.criadorNome}>{evento.criador.nome}</Text>
-                  <Text style={estilos.criadorRole}>Organizador</Text>
+                  <Text style={estilos.criadorNome}>{evento.grupo}</Text>
+                  <Text style={estilos.criadorRole}>Grupo organizador</Text>
                 </View>
               </View>
 
@@ -337,7 +397,10 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
               <Text style={estilos.rotulo}>DESCRIÇÃO</Text>
               {modoEdicao ? (
                 <TextInput
-                  style={[estilos.input, { minHeight: 80, textAlignVertical: "top" }]}
+                  style={[
+                    estilos.input,
+                    { minHeight: 80, textAlignVertical: "top" },
+                  ]}
                   value={form.descricao}
                   onChangeText={(v) => setForm((f) => ({ ...f, descricao: v }))}
                   placeholder="Descrição do evento"
@@ -352,10 +415,17 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 onPress={abrirListaParticipantes}
                 style={estilos.participantesHeader}
               >
-                <Text style={[estilos.rotulo, { marginTop: 20, marginBottom: 0 }]}>
+                <Text
+                  style={[estilos.rotulo, { marginTop: 20, marginBottom: 0 }]}
+                >
                   PARTICIPANTES ({evento.participantesCount}/{evento.total})
                 </Text>
-                <FontAwesomeIcon icon={faChevronRight} size={11} color="#555" style={{ marginTop: 20 }} />
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={11}
+                  color="#555"
+                  style={{ marginTop: 20 }}
+                />
               </TouchableOpacity>
               <View style={estilos.participantesRow}>
                 <Text style={estilos.vagasTexto}>
@@ -386,21 +456,45 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                           onPress={() => setListaParticipantesVisivel(false)}
                           style={estilos.botaoFechar}
                         >
-                          <FontAwesomeIcon icon={faXmark} size={14} color="#888" />
+                          <FontAwesomeIcon
+                            icon={faXmark}
+                            size={14}
+                            color="#888"
+                          />
                         </TouchableOpacity>
                       </View>
                       {carregandoParticipantes ? (
-                        <ActivityIndicator color="#00FFD1" style={{ marginTop: 24 }} />
+                        <ActivityIndicator
+                          color="#00FFD1"
+                          style={{ marginTop: 24 }}
+                        />
                       ) : participantes.length === 0 ? (
-                        <Text style={estilos.semParticipantes}>Nenhum participante ainda.</Text>
+                        <Text style={estilos.semParticipantes}>
+                          Nenhum participante ainda.
+                        </Text>
                       ) : (
-                        <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
+                        <ScrollView
+                          showsVerticalScrollIndicator={false}
+                          style={{ maxHeight: 400 }}
+                        >
                           {participantes.map((p) => (
-                            <View key={p.userId} style={estilos.participanteItem}>
-                              <View style={[estilos.avatarCriador, { backgroundColor: p.corAvatar }]}>
-                                <Text style={estilos.avatarCriadorTexto}>{p.iniciais}</Text>
+                            <View
+                              key={p.userId}
+                              style={estilos.participanteItem}
+                            >
+                              <View
+                                style={[
+                                  estilos.avatarCriador,
+                                  { backgroundColor: p.corAvatar },
+                                ]}
+                              >
+                                <Text style={estilos.avatarCriadorTexto}>
+                                  {p.iniciais}
+                                </Text>
                               </View>
-                              <Text style={estilos.participanteNome}>{p.nome}</Text>
+                              <Text style={estilos.participanteNome}>
+                                {p.nome}
+                              </Text>
                             </View>
                           ))}
                         </ScrollView>
@@ -415,18 +509,26 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
               )}
 
               {modoEdicao ? (
-                <TouchableOpacity style={estilos.botaoSalvar} onPress={handleSalvar}>
-                  <Text style={estilos.botaoParticiparTexto}>Salvar Alterações</Text>
+                <TouchableOpacity
+                  style={estilos.botaoSalvar}
+                  onPress={handleSalvar}
+                >
+                  <Text style={estilos.botaoParticiparTexto}>
+                    Salvar Alterações
+                  </Text>
                 </TouchableOpacity>
               ) : isOrganizador ? (
-                <TouchableOpacity style={estilos.botaoEditar} onPress={() => setModoEdicao(true)}>
+                <TouchableOpacity
+                  style={estilos.botaoEditar}
+                  onPress={() => setModoEdicao(true)}
+                >
                   <Text style={estilos.botaoEditarTexto}>Editar Evento</Text>
                 </TouchableOpacity>
               ) : isParticipante ? (
                 <>
                   <View style={estilos.bannerInscrito}>
                     <Text style={estilos.bannerInscritoTexto}>
-                      ✓ Você está inscrito neste evento
+                      Você está inscrito neste evento
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -441,7 +543,10 @@ const ModalEvento = ({ evento, visivel, onFechar, onSalvar }: Props) => {
                 </>
               ) : (
                 <TouchableOpacity
-                  style={[estilos.botaoParticipar, inscrevendo && { opacity: 0.6 }]}
+                  style={[
+                    estilos.botaoParticipar,
+                    inscrevendo && { opacity: 0.6 },
+                  ]}
                   onPress={handleParticipar}
                   disabled={inscrevendo}
                 >
