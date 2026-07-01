@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { ScrollView, Text, TouchableOpacity } from "react-native";
 import styles from "@/src/styles/feed.styles";
 
 type Props = {
@@ -8,7 +8,12 @@ type Props = {
 };
 
 const FeedFiltros = ({ filtros, filtroAtivo, onSelectFiltro }: Props) => (
-  <View style={styles.filtros}>
+  <ScrollView
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={styles.filtros}
+    style={{ marginBottom: 20, flexGrow: 0 }}
+  >
     {filtros.map((f) => (
       <TouchableOpacity
         key={f}
@@ -20,7 +25,7 @@ const FeedFiltros = ({ filtros, filtroAtivo, onSelectFiltro }: Props) => (
         </Text>
       </TouchableOpacity>
     ))}
-  </View>
+  </ScrollView>
 );
 
 export default FeedFiltros;

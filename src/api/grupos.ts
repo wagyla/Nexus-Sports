@@ -99,19 +99,44 @@ export const postEntrarGrupo = async (grupoId: string, userId: string): ApiResul
 };
 
 export const deleteGrupo = async (grupoId: string, userId: string): ApiResult<null> => {
+  // 1. Busca IDs dos eventos do grupo para deletar participantes
+  const { data: eventosDogGrupo } = await supabase
+    .from("eventos")
+    .select("id")
+    .eq("grupo_id", grupoId);
+
+  const eventoIds = (eventosDogGrupo ?? []).map((e: { id: string }) => e.id);
+
+  // 2. Deleta participantes dos eventos
+  if (eventoIds.length > 0) {
+    const { error: erroParticipantes } = await supabase
+      .from("participantes_evento")
+      .delete()
+      .in("evento_id", eventoIds);
+    if (erroParticipantes) return { data: undefined, error: erroParticipantes.message };
+  }
+
+  // 3. Deleta os eventos
   const { error: erroEventos } = await supabase
     .from("eventos")
     .delete()
     .eq("grupo_id", grupoId);
-
   if (erroEventos) return { data: undefined, error: erroEventos.message };
 
+  // 4. Deleta membros do grupo
+  const { error: erroMembros } = await supabase
+    .from("membros_grupos")
+    .delete()
+    .eq("grupo_id", grupoId);
+  if (erroMembros) return { data: undefined, error: erroMembros.message };
+
+  // 5. Deleta o grupo
   const { error } = await supabase
     .from(TABELA)
     .delete()
     .eq("id", grupoId)
     .eq("criado_por", userId);
-
   if (error) return { data: undefined, error: error.message };
+
   return { data: null, error: undefined };
 };

@@ -7,13 +7,39 @@ import {
   Modal,
   Animated,
   Pressable,
+  ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { corDoEsporte } from "@/src/components/helpers";
 import { deleteGrupo, postEntrarGrupo, deleteSairDoGrupo } from "@/src/api/grupos";
-import type { GrupoDisplay } from "@/src/types";
+import { getEventosDoGrupo } from "@/src/api/eventos";
+import type { GrupoDisplay, EventoSupabase } from "@/src/types";
+
+const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+const ICONE_MDI: Record<string, string> = {
+  corrida: "run",
+  ciclismo: "bike",
+  tenis: "tennis",
+  volei: "volleyball",
+  futebol: "soccer",
+  natacao: "swim",
+  outro: "trophy-variant",
+};
+
+const iconeMDI = (esporte: string): string =>
+  ICONE_MDI[esporte?.toLowerCase()] ?? "trophy-variant";
+
+const formatarDataEvento = (dataHora: string): string => {
+  const iso = (dataHora ?? "").split("T")[0];
+  const [, mes, dia] = iso.split("-");
+  const hora = (dataHora ?? "").split("T")[1]?.slice(0, 5) ?? "";
+  return dia && mes ? `${dia} ${MESES[Number(mes) - 1]} · ${hora}` : "";
+};
 
 type Props = {
   grupo: GrupoDisplay | undefined;
@@ -43,6 +69,9 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado, onEntrou }
   const [confirmandoSaida, setConfirmandoSaida] = useState(false);
   const [saindo, setSaindo] = useState(false);
   const [erroSaida, setErroSaida] = useState<string | undefined>(undefined);
+  const [eventosGrupo, setEventosGrupo] = useState<EventoSupabase[]>([]);
+  const [carregandoEventos, setCarregandoEventos] = useState(false);
+  const [eventosExpandidos, setEventosExpandidos] = useState(false);
 
   useEffect(() => {
     if (visivel) {
@@ -64,10 +93,23 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado, onEntrou }
       setErroEntrada(undefined);
       setConfirmandoSaida(false);
       setErroSaida(undefined);
+      setEventosGrupo([]);
+      setEventosExpandidos(false);
+      setCarregandoEventos(false);
     }
   }, [visivel]);
 
   if (!grupo) return null;
+
+  const toggleEventos = async () => {
+    if (!eventosExpandidos && eventosGrupo.length === 0) {
+      setCarregandoEventos(true);
+      const { data } = await getEventosDoGrupo(grupo.id);
+      setEventosGrupo(data ?? []);
+      setCarregandoEventos(false);
+    }
+    setEventosExpandidos((prev) => !prev);
+  };
 
   const confirmarSaida = async () => {
     if (!user) return;
@@ -135,10 +177,51 @@ const ModalGrupo = ({ grupo, visivel, isMembro, onFechar, onDeletado, onEntrou }
               <View style={{ height: 20 }} />
               <InfoLinha rotulo="MEMBROS" valor={`${grupo.membros} participantes`} />
               <View style={{ height: 20 }} />
-              <InfoLinha
-                rotulo="EVENTOS ATIVOS"
-                valor={`${grupo.eventos} evento${grupo.eventos !== 1 ? "s" : ""}`}
-              />
+
+              <Text style={estilos.rotulo}>EVENTOS ATIVOS</Text>
+              <TouchableOpacity
+                style={estilos.eventosHeader}
+                onPress={toggleEventos}
+                activeOpacity={0.7}
+              >
+                <Text style={estilos.valor}>
+                  {grupo.eventos} evento{grupo.eventos !== 1 ? "s" : ""}
+                </Text>
+                <MaterialCommunityIcons
+                  name={eventosExpandidos ? "chevron-up" : "chevron-down"}
+                  size={18}
+                  color="#555"
+                />
+              </TouchableOpacity>
+
+              {eventosExpandidos && (
+                <View style={estilos.eventosLista}>
+                  {carregandoEventos ? (
+                    <ActivityIndicator color="#00FFD1" style={{ marginVertical: 12 }} />
+                  ) : eventosGrupo.length === 0 ? (
+                    <Text style={estilos.eventosVazio}>Nenhum evento encontrado.</Text>
+                  ) : (
+                    eventosGrupo.map((ev) => {
+                      const cor = corDoEsporte(ev.esporte);
+                      return (
+                        <View key={ev.id} style={estilos.eventoItem}>
+                          <View style={[estilos.eventoIcone, { backgroundColor: cor + "22" }]}>
+                            <MaterialCommunityIcons
+                              name={iconeMDI(ev.esporte) as any}
+                              size={16}
+                              color={cor}
+                            />
+                          </View>
+                          <View style={estilos.eventoInfo}>
+                            <Text style={estilos.eventoNome}>{ev.nome}</Text>
+                            <Text style={estilos.eventoData}>{formatarDataEvento(ev.data_hora)}</Text>
+                          </View>
+                        </View>
+                      );
+                    })
+                  )}
+                </View>
+              )}
 
               <View style={estilos.divisor} />
 
@@ -311,6 +394,48 @@ const estilos = StyleSheet.create({
   },
   valor: { color: "#ffffff", fontSize: 14, fontWeight: "500" },
   descricao: { color: "#ccc", fontSize: 13, lineHeight: 20, marginTop: 4 },
+  eventosHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  eventosLista: {
+    marginTop: 10,
+    gap: 8,
+  },
+  eventosVazio: {
+    color: "#555",
+    fontSize: 13,
+    paddingVertical: 8,
+  },
+  eventoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1A1A",
+    borderRadius: 10,
+    padding: 10,
+    gap: 10,
+  },
+  eventoIcone: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  eventoInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  eventoNome: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  eventoData: {
+    color: "#555",
+    fontSize: 12,
+  },
   participantesRow: { flexDirection: "row", alignItems: "center", marginTop: 8 },
   miniAvatar: {
     width: 32,
