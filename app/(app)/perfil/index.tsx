@@ -12,11 +12,11 @@ import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
-import Navbar from "@/src/components/Navbar";
-import ModalEventosPerfil from "@/src/components/ModalEventosPerfil";
-import ModalGruposPerfil from "@/src/components/ModalGruposPerfil";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { corDoEsporte, iniciaisDoNome } from "@/src/components/helpers";
+import Navbar from "@/src/componentes/Navbar";
+import ModalEventosPerfil from "@/src/componentes/ModalEventosPerfil";
+import ModalGruposPerfil from "@/src/componentes/ModalGruposPerfil";
+import { useAuth } from "@/src/contextos/AuthContext";
+import { corDoEsporte, iniciaisDoNome } from "@/src/componentes/helpers";
 import { getMeusEventosPaginados, countMeusEventos } from "@/src/api/eventos";
 import { getMeusGrupos, countMeusGrupos } from "@/src/api/grupos";
 import type { EventoSupabase } from "@/src/types";
@@ -227,7 +227,7 @@ const Profile = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.botaoEditar}
-          onPress={() => router.push("/(app)/profile/edit")}
+          onPress={() => router.push("/(app)/perfil/edit")}
         >
           <FontAwesomeIcon icon={faPencil} size={14} color="#00FFD1" />
           <Text style={styles.botaoEditarTexto}>Editar</Text>

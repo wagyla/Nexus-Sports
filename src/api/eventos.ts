@@ -1,6 +1,6 @@
 import { supabase } from "@/utils/supabase";
 import type { EventoSupabase, EventoForm, ParticipanteDisplay } from "@/src/types";
-import { iniciaisDoNome, gerarCorAvatar } from "@/src/components/helpers";
+import { iniciaisDoNome, gerarCorAvatar } from "@/src/componentes/helpers";
 
 const TABELA = "eventos";
 

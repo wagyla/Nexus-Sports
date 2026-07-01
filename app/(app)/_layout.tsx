@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import AuthGuard from "@/src/components/AuthGuard";
+import AuthGuard from "@/src/componentes/AuthGuard";
 
 const AppLayout = () => (
   <AuthGuard>

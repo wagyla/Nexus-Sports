@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  Switch,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -15,9 +14,9 @@ import {
   ChipSelector,
   PrimaryButton,
   ChipOption,
-} from "@/src/components/Formulario";
+} from "@/src/componentes/Formulario";
 import { router } from "expo-router";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 import { postCreateGrupo } from "@/src/api/grupos";
 import type { GrupoForm } from "@/src/types";
 
@@ -112,23 +111,6 @@ const NewGroup = () => {
             style={{ height: 80, textAlignVertical: "top", paddingTop: 12 }}
           />
 
-          <View style={styles.privadoRow}>
-            <View>
-              <Text style={styles.privadoLabel}>Grupo privado</Text>
-              <Text style={styles.privadoSub}>
-                {grupo.privado
-                  ? "Somente por convite"
-                  : "Qualquer pessoa pode encontrar"}
-              </Text>
-            </View>
-            <Switch
-              value={grupo.privado}
-              onValueChange={set("privado")}
-              trackColor={{ false: "#333", true: "#00FFD155" }}
-              thumbColor={grupo.privado ? "#00FFD1" : "#666"}
-            />
-          </View>
-
           <PrimaryButton
             title="Criar Grupo"
             onPress={handleCriarGrupo}
@@ -159,17 +141,4 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   headerTitle: { color: "#fff", fontSize: 26, fontWeight: "700" },
-  privadoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#111",
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: "#222",
-  },
-  privadoLabel: { color: "#fff", fontSize: 15, fontWeight: "600" },
-  privadoSub: { color: "#666", fontSize: 12, marginTop: 2 },
 });

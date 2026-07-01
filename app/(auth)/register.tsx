@@ -15,9 +15,9 @@ import {
   PrimaryButton,
   RowFields,
   ChipOption,
-} from "@/src/components/Formulario";
+} from "@/src/componentes/Formulario";
 import { router } from "expo-router";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 
 const SPORTS: ChipOption[] = [
   { label: "Corrida", value: "corrida" },

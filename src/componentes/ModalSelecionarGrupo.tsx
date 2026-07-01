@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
-import { supabase } from "@/utils/supabase";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faXmark,
@@ -21,9 +20,10 @@ import {
   faChevronRight,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
+import { corDoEsporte, iconeDoEsporte, emojiDoEsporte } from "./helpers";
 import type { Grupo } from "@/src/types";
-import { SupabaseTablesEnum } from "@/utils/Enums";
-import { corDoEsporte, iconeDoEsporte } from "@/src/components/helpers";
+import { getMeusGrupos, getGruposParticipando } from "@/src/api/grupos";
+import { useAuth } from "@/src/contextos/AuthContext";
 
 type Props = {
   visivel: boolean;
@@ -31,6 +31,7 @@ type Props = {
 };
 
 const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
+  const { user } = useAuth();
   const slideAnim = useRef(new Animated.Value(700)).current;
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [busca, setBusca] = useState("");
@@ -56,14 +57,15 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   }, [visivel]);
 
   const carregarGrupos = async () => {
+    if (!user) return;
     setCarregando(true);
-
-    const { data, error } = await supabase
-      .from(SupabaseTablesEnum.GRUPOS)
-      .select("*");
-    if (!error && data) {
-      setGrupos(data as Grupo[]);
-    }
+    const [criados, participando] = await Promise.all([
+      getMeusGrupos(user.id),
+      getGruposParticipando(user.id),
+    ]);
+    const todos = [...(criados.data ?? []), ...(participando.data ?? [])];
+    const unicos = todos.filter((g, i, arr) => arr.findIndex((x) => x.id === g.id) === i);
+    setGrupos(unicos as Grupo[]);
     setCarregando(false);
   };
 
@@ -74,14 +76,14 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
   const handleSelecionarGrupo = (grupo: Grupo) => {
     onFechar();
     router.push({
-      pathname: "/(app)/events/new",
+      pathname: "/(app)/eventos/new",
       params: { grupoId: grupo.id, grupoNome: grupo.nome },
     });
   };
 
   const handleCriarGrupo = () => {
     onFechar();
-    router.push("/(app)/groups/new");
+    router.push("/(app)/grupos/new");
   };
 
   return (
@@ -110,7 +112,12 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
             </Text>
 
             <View style={estilos.buscaContainer}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} size={15} color="#555" style={estilos.buscaIcone} />
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                size={15}
+                color="#555"
+                style={estilos.buscaIcone}
+              />
               <TextInput
                 style={estilos.buscaInput}
                 placeholder="Buscar grupo..."
@@ -119,7 +126,10 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                 onChangeText={setBusca}
               />
               {busca.length > 0 && (
-                <TouchableOpacity onPress={() => setBusca("")} style={{ paddingHorizontal: 8 }}>
+                <TouchableOpacity
+                  onPress={() => setBusca("")}
+                  style={{ paddingHorizontal: 8 }}
+                >
                   <FontAwesomeIcon icon={faXmark} size={14} color="#555" />
                 </TouchableOpacity>
               )}
@@ -181,7 +191,11 @@ const ModalSelecionarGrupo = ({ visivel, onFechar }: Props) => {
                           </View>
                         )}
                       </View>
-                      <FontAwesomeIcon icon={faChevronRight} size={14} color="#444" />
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={14}
+                        color="#444"
+                      />
                     </TouchableOpacity>
                   );
                 })

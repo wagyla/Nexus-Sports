@@ -20,9 +20,9 @@ import {
   faCalendarDays,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import WheelTimePicker from "@/src/components/WheelTimePicker";
+import WheelTimePicker from "@/src/componentes/WheelTimePicker";
 import { formatarDataCompleta, hojeISO } from "./helpers";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 import {
   getParticipantesEvento,
   getIsParticipante,

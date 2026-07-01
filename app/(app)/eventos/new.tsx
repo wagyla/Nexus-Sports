@@ -12,18 +12,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
-import WheelTimePicker from "@/src/components/WheelTimePicker";
+import WheelTimePicker from "@/src/componentes/WheelTimePicker";
 import {
   FormField,
   ChipSelector,
   PrimaryButton,
   RowFields,
   ChipOption,
-} from "@/src/components/Formulario";
+} from "@/src/componentes/Formulario";
 import { router, useLocalSearchParams } from "expo-router";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 import { postCreateEvento } from "@/src/api/eventos";
-import { hojeISO } from "@/src/components/helpers";
+import { hojeISO } from "@/src/componentes/helpers";
 import type { EventoForm } from "@/src/types";
 
 const ESPORTES: ChipOption[] = [
@@ -94,6 +94,7 @@ const NewEventScreen = () => {
   const [erros, setErros] = useState<Erros>({});
   const [salvando, setSalvando] = useState(false);
   const [calendarioVisivel, setCalendarioVisivel] = useState(false);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const set =
     <K extends keyof EventoForm>(campo: K) =>
@@ -133,6 +134,7 @@ const NewEventScreen = () => {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          scrollEnabled={scrollEnabled}
         >
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()}>
@@ -188,6 +190,8 @@ const NewEventScreen = () => {
               setEvento((prev) => ({ ...prev, hora: t }));
               setErros((prev) => ({ ...prev, hora: undefined }));
             }}
+            onScrollLock={() => setScrollEnabled(false)}
+            onScrollUnlock={() => setScrollEnabled(true)}
           />
           {erros.hora && <Text style={styles.erro}>{erros.hora}</Text>}
 

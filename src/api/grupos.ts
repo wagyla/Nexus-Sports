@@ -16,12 +16,11 @@ export const getMeusGrupos = async (userId: string): ApiResult<GrupoSupabase[]> 
   return { data: (data ?? []) as GrupoSupabase[], error: undefined };
 };
 
-export const getGruposPublicos = async (limit = 5): ApiResult<GrupoSupabase[]> => {
+export const getGruposPublicos = async (): ApiResult<GrupoSupabase[]> => {
   const { data, error } = await supabase
     .from(TABELA)
     .select(COLUNAS)
-    .eq("privado", false)
-    .limit(limit);
+    .eq("privado", false);
 
   if (error) return { data: undefined, error: error.message };
   return { data: (data ?? []) as GrupoSupabase[], error: undefined };

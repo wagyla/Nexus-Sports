@@ -1,9 +1,9 @@
 import React from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { Redirect } from "expo-router";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 
-const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+const GuestGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -14,12 +14,12 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user) return <Redirect href="/(auth)/login" />;
+  if (user) return <Redirect href="/(app)/feed" />;
 
   return <>{children}</>;
 };
 
-export default AuthGuard;
+export default GuestGuard;
 
 const styles = StyleSheet.create({
   center: {

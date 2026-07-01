@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import GuestGuard from "@/src/components/GuestGuard";
+import GuestGuard from "@/src/componentes/GuestGuard";
 
 const AuthLayout = () => (
   <GuestGuard>

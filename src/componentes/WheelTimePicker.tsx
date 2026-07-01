@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { View, Text, Animated, PanResponder, StyleSheet } from "react-native";
+import { View, Text, Animated, Easing, PanResponder, StyleSheet } from "react-native";
 
 const ITEM_H = 50;
 const VISIBLE = 5;
@@ -28,9 +28,11 @@ type ColumnProps = {
   initialIndex: number;
   width: number;
   onChange: (index: number) => void;
+  onScrollLock?: () => void;
+  onScrollUnlock?: () => void;
 };
 
-function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
+function WheelColumn({ items, initialIndex, width, onChange, onScrollLock, onScrollUnlock }: ColumnProps) {
   const translateY = useRef(new Animated.Value(toY(initialIndex))).current;
   const activeIdx = useRef(initialIndex);
   const startY = useRef(toY(initialIndex));
@@ -39,11 +41,11 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
     const target = toY(idx);
     startY.current = target;
 
-    Animated.spring(translateY, {
+    Animated.timing(translateY, {
       toValue: target,
-      useNativeDriver: false,
-      tension: 90,
-      friction: 14,
+      duration: 120,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
     }).start();
 
     if (idx !== activeIdx.current) {
@@ -60,6 +62,7 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
       onMoveShouldSetPanResponderCapture: () => true,
 
       onPanResponderGrant: () => {
+        onScrollLock?.();
         translateY.stopAnimation((v) => {
           startY.current = v;
           translateY.setValue(v);
@@ -71,12 +74,14 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
       },
 
       onPanResponderRelease: (_, { dy, vy }) => {
+        onScrollUnlock?.();
         const released = clampY(startY.current + dy, items.length);
-        const withInertia = clampY(released + vy * ITEM_H * 4, items.length);
+        const withInertia = clampY(released + vy * ITEM_H * 2, items.length);
         snap(toIndex(withInertia, items.length));
       },
 
       onPanResponderTerminate: (_, { dy }) => {
+        onScrollUnlock?.();
         snap(toIndex(clampY(startY.current + dy, items.length), items.length));
       },
     })
@@ -126,9 +131,11 @@ function WheelColumn({ items, initialIndex, width, onChange }: ColumnProps) {
 type Props = {
   value: string;
   onChange: (time: string) => void;
+  onScrollLock?: () => void;
+  onScrollUnlock?: () => void;
 };
 
-const WheelTimePicker = ({ value, onChange }: Props) => {
+const WheelTimePicker = ({ value, onChange, onScrollLock, onScrollUnlock }: Props) => {
   const match = value.match(/^(\d{1,2}):(\d{2})$/);
   const initH = Math.min(parseInt(match?.[1] ?? "0", 10), 23);
   const initM = Math.min(Math.round(parseInt(match?.[2] ?? "0", 10) / 5), 11);
@@ -151,6 +158,8 @@ const WheelTimePicker = ({ value, onChange }: Props) => {
             hRef.current = i;
             onChange(`${HOURS[i]}:${MINUTES[mRef.current]}`);
           }}
+          onScrollLock={onScrollLock}
+          onScrollUnlock={onScrollUnlock}
         />
 
         <Text style={s.colon}>:</Text>
@@ -163,6 +172,8 @@ const WheelTimePicker = ({ value, onChange }: Props) => {
             mRef.current = i;
             onChange(`${HOURS[hRef.current]}:${MINUTES[i]}`);
           }}
+          onScrollLock={onScrollLock}
+          onScrollUnlock={onScrollUnlock}
         />
       </View>
     </View>

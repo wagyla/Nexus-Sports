@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import style from "./login.styles";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 
 const Login = () => {
   const { signIn } = useAuth();
@@ -46,7 +46,7 @@ const Login = () => {
     <View style={style.container}>
       <View style={style.boxTop}>
         <Image
-          source={require("../../assets/images/logo-nexus.png")}
+          source={require("../../assets/imagens/logo-nexus.png")}
           style={style.logo}
           resizeMode="contain"
         />

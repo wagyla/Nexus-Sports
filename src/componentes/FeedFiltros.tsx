@@ -1,5 +1,5 @@
 import { ScrollView, Text, TouchableOpacity } from "react-native";
-import styles from "@/src/styles/feed.styles";
+import styles from "@/src/estilos/feed.styles";
 
 type Props = {
   filtros: string[];

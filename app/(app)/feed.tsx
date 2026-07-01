@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
-import Navbar from "@/src/components/Navbar";
-import styles from "@/src/styles/feed.styles";
+import Navbar from "@/src/componentes/Navbar";
+import styles from "@/src/estilos/feed.styles";
 
-import { mapEvento, iniciaisDoNome } from "@/src/components/helpers";
+import { mapEvento, iniciaisDoNome } from "@/src/componentes/helpers";
 import type { Evento } from "@/src/types";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 import { getFeedEventos, getContagemParticipantes } from "@/src/api/eventos";
 
-import FeedHeader from "@/src/components/FeedHeader";
-import FeedFiltros from "@/src/components/FeedFiltros";
-import EventoCard from "@/src/components/EventoCard";
-import ModalEvento from "@/src/components/ModalEvento";
+import FeedHeader from "@/src/componentes/FeedHeader";
+import FeedFiltros from "@/src/componentes/FeedFiltros";
+import EventoCard from "@/src/componentes/EventoCard";
+import ModalEvento from "@/src/componentes/ModalEvento";
 
 const NOME_ESPORTE: Record<string, string> = {
   corrida: "Corrida",

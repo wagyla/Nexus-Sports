@@ -12,8 +12,8 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
-import { ChipSelector, ChipOption } from "@/src/components/Formulario";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { ChipSelector, ChipOption } from "@/src/componentes/Formulario";
+import { useAuth } from "@/src/contextos/AuthContext";
 import { supabase } from "@/utils/supabase";
 
 const ESPORTES: ChipOption[] = [
@@ -73,7 +73,7 @@ const EditProfile = () => {
       Alert.alert("Erro", error.message);
       return;
     }
-    router.push("/(app)/profile");
+    router.push("/(app)/perfil");
   };
 
   return (
@@ -90,7 +90,7 @@ const EditProfile = () => {
           <View style={estilos.cabecalho}>
             <TouchableOpacity
               style={estilos.botaoVoltar}
-              onPress={() => router.push("/(app)/profile")}
+              onPress={() => router.push("/(app)/perfil")}
             >
               <Text style={estilos.botaoVoltarTexto}>‹</Text>
               <Text style={estilos.titulo}>Editar Perfil</Text>
@@ -158,7 +158,7 @@ const EditProfile = () => {
 
           <TouchableOpacity
             style={estilos.botaoCancelar}
-            onPress={() => router.push("/(app)/profile")}
+            onPress={() => router.push("/(app)/perfil")}
           >
             <Text style={estilos.botaoCancelarTexto}>Cancelar</Text>
           </TouchableOpacity>

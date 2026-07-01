@@ -13,8 +13,8 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { corDoEsporte } from "@/src/components/helpers";
+import { useAuth } from "@/src/contextos/AuthContext";
+import { corDoEsporte } from "@/src/componentes/helpers";
 import { deleteGrupo, postEntrarGrupo, deleteSairDoGrupo } from "@/src/api/grupos";
 import { getEventosDoGrupo } from "@/src/api/eventos";
 import type { GrupoDisplay, EventoSupabase } from "@/src/types";

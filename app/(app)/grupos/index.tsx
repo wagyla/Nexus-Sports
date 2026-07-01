@@ -9,11 +9,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
-import Navbar from "@/src/components/Navbar";
-import GrupoCard from "@/src/components/GrupoCard";
-import ModalGrupo from "@/src/components/ModalGrupo";
+import Navbar from "@/src/componentes/Navbar";
+import GrupoCard from "@/src/componentes/GrupoCard";
+import ModalGrupo from "@/src/componentes/ModalGrupo";
 import type { GrupoSupabase, GrupoDisplay } from "@/src/types";
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/contextos/AuthContext";
 import { getMeusGrupos, getGruposPublicos, getGruposParticipando } from "@/src/api/grupos";
 
 const mapGrupo = (g: GrupoSupabase, isAdmin: boolean): GrupoDisplay => ({
@@ -96,7 +96,7 @@ const Groups = () => {
           <Text style={estilos.titulo}>Grupos</Text>
           <TouchableOpacity
             style={estilos.botaoNovo}
-            onPress={() => router.push("/(app)/groups/new")}
+            onPress={() => router.push("/(app)/grupos/new")}
             activeOpacity={0.7}
           >
             <Text style={estilos.botaoNovoTexto}>+ Novo</Text>

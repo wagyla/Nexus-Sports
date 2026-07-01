@@ -4,7 +4,7 @@ import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import ModalSelecionarGrupo from "@/src/components/ModalSelecionarGrupo";
+import ModalSelecionarGrupo from "@/src/componentes/ModalSelecionarGrupo";
 
 type Props = {
   itemAtivo: "feed" | "grupos" | "novoEvento" | "perfil";
@@ -49,7 +49,7 @@ const Navbar = ({ itemAtivo }: Props) => {
 
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => router.push("/(app)/groups")}
+          onPress={() => router.push("/(app)/grupos")}
         >
           <FontAwesomeIcon
             icon={faUsers}
