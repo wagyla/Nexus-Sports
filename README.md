@@ -50,13 +50,12 @@ Tabelas no Supabase, nessa ordem de criação:
 4. `eventos` — eventos criados dentro dos grupos
 5. `participantes_evento` — inscrições nos eventos
 
-Ative o RLS em todas as tabelas.
 
 ---
 
 ## Conexão com o Supabase
 
-Arquivo em `src/lib/supabase.ts`:
+Arquivo em `src/utils/supabase.ts`:
 
 ```ts
 import AsyncStorage from '@react-native-async-storage/async-storage'
